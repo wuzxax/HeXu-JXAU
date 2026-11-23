@@ -10,15 +10,11 @@ WebView 禁用文件访问、文件跨源访问、第三方 Cookie、地理位�
 
 ## 签名与构建
 
-旧源码 ZIP 曾包含 debug.keystore，应将其视为已暴露，不能继续作为现代 Android 的唯一发布凭证。本版采用新的 RSA-3072 私钥；私钥存放于源码目录外的 `%USERPROFILE%/.jxau-pocket-signing`，目录 ACL 仅允许当前 Windows 用户和 SYSTEM，密码用当前用户 DPAPI 加密。请单独妥善备份新私钥、密码及公开签名谱系；不要上传它们到仓库、聊天或源码压缩包。
+旧源码 ZIP 曾包含 debug.keystore，应将其视为已暴露，不能继续作为现代 Android 的唯一发布凭证。本版采用新的 RSA-3072 私钥；私钥存放于源码目录外，目录 ACL 仅允许当前 Windows 用户和 SYSTEM，密码用当前用户 DPAPI 加密
 
-`pwsh -NoProfile -File build-secure.ps1` 解密密码到构建子进程环境，用完清除；`build.py` 也可接收 JXAU_SIGNING_DIR 和 JXAU_RELEASE_PASSWORD。构建需要外部 legacy.keystore、release-v2.p12、release.lineage，源码包故意不包含私钥。其他开发者需要自己的测试签名，无法用自己的密钥覆盖现有正式安装。
+源码包故意不包含私钥。其他开发者需要自己的测试签名，无法用自己的密钥覆盖现有正式安装。
 
-Android 9/API 28 起使用新签名与签名谱系，保留旧安装数据，关闭旧证书的 rollback、shared UID、permission、auth 能力。旧证书的 installed-data 能力仅用于新证书继承已有应用数据。新证书 SHA-256：`8e98eb9da74adbec52414c7283a32830b45a686f587e42b5deaa85a5e70ab8de`。
-
-Android 7/8 不支持签名轮换，本包为保留兼容性仍使用旧 v1/v2 签名，因此这些旧系统不能消除旧密钥暴露的风险；同样，不曾升级到本版的旧安装仍使用旧签名。不能声称已撤销所有旧包。已下载的旧源码包无法收回。
-
-只使用 `python package_source.py <源码ZIP输出绝对路径>` 导出源码。脚本按目录白名单打包并拒绝私钥格式，排除密钥、HAR、APK、构建产物等。不要使用整个工程目录的递归压缩替代它。
+Android 9/API 28 起使用新签名与签名谱系，保留旧安装数据，关闭旧证书的 rollback、shared UID、permission、auth 能力。
 
 ## 尚存边界
 
