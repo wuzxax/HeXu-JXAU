@@ -1,0 +1,98 @@
+:root{--motion-carry:cubic-bezier(.22,.68,.2,1);--motion-settle:cubic-bezier(.32,.72,.25,1)}
+.action-confirm{animation:none;border-radius:var(--radius,23px);max-height:calc(100dvh - 48px);overflow-y:auto}
+.widget-help{max-width:390px;padding:23px}.widget-help h2{font-size:18px}.widget-help p{margin-bottom:15px}.widget-help ol{padding-left:21px;margin:0 0 17px;color:var(--muted);font-size:13px;line-height:1.85}.widget-help li+li{margin-top:9px}.widget-help strong{color:var(--ink);font-weight:700}.widget-help-note{border-top:1px solid var(--line);padding-top:13px}.widget-help .action-confirm-buttons a{display:flex;align-items:center;justify-content:center;flex:1;border-radius:12px;min-height:44px;background:var(--green);color:#fff;text-decoration:none;font-size:13px;font-weight:600}
+.home-water-choice{position:relative;flex-shrink:0}.home-water-choice>button{display:flex;align-items:center;gap:10px;font:inherit;font-size:11px;color:var(--green);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:7px 10px;min-height:34px}.home-water-choice>button>span:last-child{transition:transform .3s var(--motion-carry)}.home-water-choice>button[aria-expanded=true]>span:last-child{transform:rotate(180deg)}
+.home-water-menu{position:absolute;right:0;top:calc(100% + 7px);width:144px;padding:5px;border:1px solid var(--line);border-radius:15px;background:var(--card);box-shadow:0 12px 32px #17362b22;z-index:30;transform-origin:top right}.home-water-menu button{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;border:0;border-radius:10px;background:transparent;color:var(--ink);font:inherit;font-size:12px;min-height:42px;padding:9px 10px;text-align:left}.home-water-menu button[aria-checked=true]{background:var(--bg);color:var(--green);font-weight:650}.home-water-menu button[aria-checked=false] span{visibility:hidden}.home-water-menu button:focus-visible{outline:2px solid var(--green);outline-offset:-2px}.home-water-choice:has(>button[aria-expanded=true]){z-index:30}
+@media(prefers-reduced-motion:reduce){.home-water-choice>button>span:last-child{transition:none}}
+
+#detail.detail{transition:transform .46s var(--motion-carry),visibility 0s linear .46s}#detailMask.mask{transition:opacity .38s ease,visibility 0s linear .46s}#detail.detail.show,#detailMask.mask.show{transition-delay:0s}
+@media(prefers-reduced-motion:reduce){#detail.detail,#detailMask.mask{transition:none}}
+
+/* Keep the three wallets independent of optional spending metadata. */
+.balances-card .balance-grid{align-items:start}.balances-card .balance-tile{min-height:53px}
+#tdWater.is-spending .balance-note{display:none}#tdWater.is-spending .balance-value{white-space:nowrap;font-size:clamp(14px,4.2vw,18px);letter-spacing:-.3px}
+#tdWater.is-spending .balance-value.unavailable{font-size:11px}
+.home-water-summary{display:flex;align-items:center;flex-wrap:wrap;gap:4px 12px;border-top:1px solid var(--line);padding-top:8px;margin-top:8px;color:var(--muted);font-size:10px;line-height:1.5;font-variant-numeric:tabular-nums}.home-water-summary span:last-child{margin-left:auto;font-size:9px}
+.feedback-contact{padding:18px;background:var(--card);border:1px solid var(--line);border-radius:18px;margin-bottom:16px}
+.surface-closing{pointer-events:none}.surface-moving{will-change:transform,opacity}
+
+/* Text stays at its final size; only the opaque surface travels. */
+.modal .modal-box,.wheel-modal .wheel-box{transform:translate3d(0,0,0);backface-visibility:hidden}
+.calendar-morph{padding:0;pointer-events:none;transform-origin:top left;will-change:transform,opacity;contain:strict}
+.password-field{position:relative}.field .password-field input{padding-right:52px;width:100%}
+.password-toggle{position:absolute;right:4px;top:50%;transform:translateY(-50%);width:44px;height:44px;border:0;border-radius:10px;background:transparent;color:var(--green);display:grid;place-items:center;cursor:pointer}
+.password-toggle svg{width:21px;height:21px}.password-toggle:focus-visible{outline:2px solid var(--green);outline-offset:-3px}
+.water-device-heading{gap:8px}.water-device-heading #waterScan,.water-device-heading #waterDeviceAdd{display:flex;align-items:center;justify-content:center;gap:5px;border:1px solid var(--line);border-radius:10px;padding:7px 10px;min-height:38px;font-size:11px}
+.water-device-heading #waterScan{color:#fff;background:var(--green);border-color:var(--green)}.water-device-heading #waterDeviceAdd{background:var(--card);color:var(--green)}
+.water-entry-caption{display:inline-flex;align-items:center;gap:5px;color:var(--muted);font-size:10px;line-height:1.6;margin-bottom:7px}.water-entry-caption svg{width:14px;height:14px}
+#waterDeviceForm .water-entry-switch{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border:1px dashed var(--line);border-radius:12px;background:var(--bg);margin:12px 0;color:var(--muted);font-size:11px}#waterDeviceForm .water-entry-switch button{border:0;background:none;color:var(--green);font:inherit;font-weight:600;min-height:30px}
+@media(max-width:350px){.water-device-heading{gap:5px}.water-device-heading #waterScan,.water-device-heading #waterDeviceAdd{padding:6px 8px;font-size:10px}}
+
+.password-eye-slash[hidden]{display:none}.calendar-modal .calendar-editor{transform:translate3d(0,0,0);backface-visibility:hidden}
+
+.water-device-row .device-recover{display:block;margin-top:6px;padding:3px 0;background:transparent;border:0;color:var(--primary,#266044);font-size:12px;text-align:left}
+
+/* Feedback occupies a stable slot; requests never push the device list. */
+#waterDeviceStatus{height:34px;min-height:34px;overflow-y:auto;overscroll-behavior:contain;line-height:17px;font-size:10px;scrollbar-width:thin;overflow-wrap:anywhere}
+.water-device-row .device-request-state{display:block;height:30px;margin-top:3px;font-size:10px;line-height:15px;font-weight:400;color:var(--muted);overflow-y:auto}
+.water-device-row .device-edit,.water-device-row .device-recover{display:inline-block;vertical-align:middle;min-height:28px;margin:2px 10px 0 0;padding:3px 0;font-size:10px}
+.water-device-row .device-recover[hidden]{display:inline-block;visibility:hidden;pointer-events:none}
+.water-device-row [data-action]{width:100px;min-width:100px;min-height:42px;line-height:17px;padding:5px 8px}
+.water-device-row .device-name{min-width:0}
+.confirm-caption{display:block;font-size:11px;font-weight:600;color:var(--green);margin-bottom:8px;letter-spacing:.04em}
+.confirm-caption[hidden],.action-confirm .confirm-note[hidden]{display:none}
+.action-confirm .confirm-note{padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);font-size:11px;line-height:1.8;margin:-7px 0 20px}
+.action-confirm[data-tone=primary] [data-confirm-accept]{background:var(--green);color:white}
+.action-confirm[open]::backdrop{animation:confirm-shade-in .4s ease both}
+.action-confirm.surface-closing::backdrop{animation:confirm-shade-out .36s ease both}
+@keyframes confirm-shade-in{from{opacity:0}to{opacity:1}}
+@keyframes confirm-shade-out{from{opacity:1}to{opacity:0}}
+.calendar-modal .calendar-editor{position:relative;z-index:1;isolation:isolate}
+.calendar-modal .calendar-editor.calendar-transitioning{background:transparent;border-color:transparent;box-shadow:none;overflow:hidden;will-change:opacity,transform}
+.calendar-modal .calendar-morph{z-index:0;background:var(--card);border-radius:22px;box-shadow:0 8px 24px #19372417}
+.nav-carry{transition-timing-function:cubic-bezier(.3,0,.2,1)}
+.saved-anim{animation:none}
+@media(prefers-reduced-motion:reduce){.action-confirm[open]::backdrop{animation:none}}
+
+/* Device controls form one compact section, separated from spending. */
+html #waterDevice .water-devices-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin:16px 0;box-shadow:none}
+html #waterDevice .water-stats-card{border-top:1px solid var(--line);padding-top:18px;margin-top:20px}
+#waterDevice .water-devices-card .section-heading{margin-bottom:4px;gap:8px}
+#waterDeviceStatus{height:18px;min-height:18px;line-height:18px;font-size:10px;margin:0;white-space:normal}
+#waterDevice .water-device-row,#waterDevice .water-device-row:last-child{background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;box-shadow:none;padding:11px 0;margin:0;min-height:0;gap:10px}
+#waterDevice .water-device-row:last-child{border-bottom:0}
+#waterDevice .water-device-row .device-name{font-size:13px;line-height:19px}
+#waterDevice .water-device-row .device-id{margin-top:1px;line-height:14px;font-size:9px}
+#waterDevice .water-device-row .device-request-state{height:16px;line-height:16px;margin-top:2px;white-space:nowrap;overflow-x:auto;overflow-y:hidden;font-size:9px}
+.device-row-tools{display:flex;align-items:center;gap:12px;height:25px;white-space:nowrap}
+#waterDevice .water-device-row .device-edit,#waterDevice .water-device-row .device-recover{display:inline-block;min-height:25px;margin:0;padding:2px 0;font-size:10px}
+#waterDevice .water-device-row .device-recover[hidden]{display:inline-block;visibility:hidden}
+#waterDevice .water-device-row [data-action]{width:84px;min-width:84px;font-size:11px}
+#waterDevice .water-widget-link{display:block;border-top:1px solid var(--line);padding:12px 0 0;margin:0;font-size:11px}
+@media(max-width:350px){#waterDevice .water-devices-card{padding:12px}.water-device-heading{gap:5px}.water-device-heading #waterScan,.water-device-heading #waterDeviceAdd{padding:5px 7px;min-height:34px}.water-devices-card .section-heading h2{font-size:13px}.device-row-tools{gap:8px}#waterDevice .water-device-row .device-recover{font-size:9px}}
+
+/* Device list: two-line identity, fixed controls, one shared hint. */
+html #waterDevice .water-devices-card{padding:0;overflow:hidden}
+.water-devices-header .balance-fold{font-size:13px;font-weight:600;padding-bottom:10px}
+#waterDeviceCount{font-size:10px;font-weight:400;margin-left:6px}
+#waterDevicesBody{padding:0 14px 12px}
+#waterDevice .water-device-row,#waterDevice .water-device-row:last-child{display:flex;align-items:center;gap:8px;padding:10px;margin:0 0 7px;min-height:62px;border:1px solid #e7ede7;border-radius:12px;background:#f7f9f5}
+#waterDevice .device-mark{display:flex;align-items:center;justify-content:center;flex:none;width:28px;height:32px;border-radius:9px;background:#e7efe3;color:var(--green);font-size:11px;font-weight:600}
+#waterDevice .water-device-row .device-name{flex:1;min-width:0;font-size:12px;line-height:18px}
+#waterDevice .water-device-row .device-name>strong{display:block;font-size:12px;font-weight:600;overflow-wrap:anywhere}
+#waterDevice .water-device-row .device-id{font-size:9px;line-height:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted);margin-top:2px}
+#waterDevice .water-device-row.has-request .device-id{color:#9a682f}
+#waterDevice .water-device-row .device-edit{width:28px;min-width:28px;height:34px;min-height:34px;padding:0;font-size:18px;color:var(--muted);border:0;background:transparent}
+#waterDevice .water-device-row [data-action]{width:58px;min-width:58px;min-height:34px;padding:7px 8px;font-size:11px;border-radius:11px}
+#waterDevice .device-row-tools{height:auto;min-height:0}
+#waterDevice .water-device-row .device-recover[hidden]{display:none}
+#waterDevice .water-device-row .device-recover{font-size:9px;white-space:normal;line-height:15px;min-height:20px;padding:2px 0}
+#waterDevice .water-device-toolbar{display:flex;gap:8px;padding:3px 0 0;justify-content:stretch}
+#waterDevice .water-device-toolbar #waterScan,#waterDevice .water-device-toolbar #waterDeviceAdd{flex:1;min-width:0;min-height:34px;padding:7px 8px;margin:0;border-radius:10px;font-size:11px;text-align:center;justify-content:center}
+#waterDevice .water-device-toolbar #waterScan{background:#e9f2e5;color:var(--green);border:1px solid #dce8d5}
+#waterDevice .water-device-toolbar #waterDeviceAdd{background:transparent;color:var(--green);border:1px solid var(--line)}
+#waterDeviceStatus{height:18px;min-height:18px;margin:5px 0 0;line-height:18px;font-size:9px;overflow:auto;white-space:nowrap}
+#waterDevice .water-widget-link{font-size:10px;padding:7px 0 0;margin-top:3px}
+html[data-style=reading] #waterDevice .water-device-row{border-radius:8px;background:transparent}
+html[data-style=soft] #waterDevice .water-device-row{border-radius:17px}
+@media(max-width:350px){#waterDevicesBody{padding:0 11px 11px}#waterDevice .water-device-row{gap:5px;padding:9px 7px}#waterDevice .device-mark{width:25px}#waterDevice .water-device-row .device-edit{width:24px;min-width:24px}}

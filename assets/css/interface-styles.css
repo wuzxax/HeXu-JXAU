@@ -1,0 +1,98 @@
+.cx-course-trigger{
+ display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;
+ min-height:44px;padding:8px 13px;text-align:left;border:1px solid var(--line);
+ border-radius:12px;background:var(--card);color:var(--ink);font-size:13px;
+}
+.cx-course-trigger>span:first-child{min-width:0;overflow-wrap:anywhere}
+.cx-course-chevron{width:8px;height:8px;flex:none;margin:-4px 3px 0 0;border:solid var(--muted);border-width:0 1.5px 1.5px 0;transform:rotate(45deg)}
+.cx-course-dialog{
+ position:fixed;inset:auto 0 calc(14px + env(safe-area-inset-bottom,0px));
+ margin:0 auto;width:calc(100% - 28px);max-width:430px;max-height:min(75dvh,460px);
+ padding:0;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);
+ color:var(--ink);box-shadow:var(--shadow);overflow:hidden;
+}
+.cx-course-dialog[open]{display:flex;flex-direction:column}
+.cx-course-dialog::backdrop{background:#101b164d}
+html[data-color-mode=dark] .cx-course-dialog::backdrop{background:#070b0d80}
+.cx-course-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px 6px}
+.cx-course-dialog-head h2{margin:0;font-size:16px}
+.cx-course-dialog-head button{padding:6px 10px;min-height:36px;border:0;border-radius:10px;background:var(--soft);color:var(--green);font-size:12px}
+.cx-course-options{overflow-y:auto;padding:0 9px 9px;scroll-padding:6px}
+.cx-course-options button{
+ display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:44px;width:100%;
+ border:0;border-bottom:1px solid var(--line);background:none;color:var(--ink);padding:8px 12px;
+ text-align:left;font-size:13px;overflow-wrap:anywhere;
+}
+.cx-course-options button:last-child{border-bottom-color:transparent}
+.cx-course-options button:focus-visible{outline-offset:-2px}
+.cx-course-options button[aria-pressed=true]{background:var(--soft);color:var(--green);border-radius:10px;border-bottom-color:transparent;font-weight:650}
+.cx-course-check{width:13px;height:13px;flex:none;color:var(--green);visibility:hidden}
+[aria-pressed=true]>.cx-course-check{visibility:visible}
+.cx-course-check::before{content:"";display:block;width:5px;height:10px;margin:auto;border:solid currentColor;border-width:0 2px 2px 0;transform:rotate(45deg)}
+
+.style-options small{display:block;margin-top:2px;color:var(--muted);font-size:10px;line-height:1.4}
+.style-options .style-sample.reading{background:#f5efe5;border-radius:9px}
+.style-options .style-sample.reading i{height:11px;border-radius:0;border-color:#b8b0a4}
+.style-options .style-sample.reading i:first-child{width:62%;height:4px;background:#4d5450;margin:7px 0 9px}
+.style-options .style-sample.soft{background:#e4ede3}
+.style-options .style-sample.soft i{background:#f5f9f3;border:0}
+.style-options .style-sample.soft i:first-child{background:#bed2c3}
+html[data-color-mode=dark] .style-options .style-sample.reading{background:#232421}
+html[data-color-mode=dark] .style-options .style-sample.reading i{background:transparent;border-color:#70736a}
+html[data-color-mode=dark] .style-options .style-sample.reading i:first-child{background:#a9bda9}
+html[data-color-mode=dark] .style-options .style-sample.soft{background:#253a36}
+html[data-color-mode=dark] .style-options .style-sample.soft i{background:#41564e}
+html[data-color-mode=dark] .style-options .style-sample.soft i:first-child{background:#739a85}
+
+/* Reading uses continuous sections with ruled separators and book-style headings. */
+html[data-style=reading]{
+ --bg:#f7f4ed;--card:#fcfaf5;--line:#ded8cc;--ink:#222b26;--muted:#555f57;--soft:#e7ece4;
+ --reading-title:"Noto Serif CJK SC","Noto Serif SC",Songti SC,SimSun,serif;
+}
+html[data-color-mode=dark][data-style=reading]{
+ --bg:#101417;--card:#1e2321;--line:#424c47;--ink:#f4f3ea;--muted:#c6cdc4;--soft:#28372e;
+ --night-raised:#262e2a;--night-accent:#34483c;
+}
+html[data-style=reading] :is(.topbar .t,.section-heading h2,#homeGreeting,.feature-heading h1){font-family:var(--reading-title);letter-spacing:0}
+html[data-style=reading] .card{padding:15px 12px;margin-bottom:12px;border-radius:8px;border:1px solid var(--line);box-shadow:none}
+html[data-style=reading] :is(#today,#settings) .card{
+ background:transparent;border:0;border-bottom:1px solid var(--line);
+ border-radius:0;padding:12px 0 15px;margin:0 0 13px;
+}
+html[data-style=reading] #today .today-hero{
+ margin:0 auto;padding:18px 18px 16px;max-width:680px;border-bottom:0;
+}
+html[data-style=reading] #today #homeGreeting{font-size:clamp(23px,6vw,30px);margin-block:4px}
+html[data-style=reading] #today .home-service-grid{border:0;padding:0;margin-top:8px}
+html[data-style=reading] #today .home-service-item{background:transparent;color:var(--ink)}
+html[data-style=reading] #today .home-service-icon{background:transparent;color:var(--green)}
+html[data-style=reading] #today .home-service-item+.home-service-item{border-color:var(--line)}
+html[data-style=reading] #settings .group-label{margin-top:16px;color:var(--green)}
+html[data-style=reading] #settings .account-card{padding-top:6px}
+html[data-style=reading] #settings .settings-group{padding:0 0 3px}
+html[data-style=reading] #settings .settings-row{min-height:49px}
+html[data-style=reading] :is(.cx-course-trigger,.topbar>button){border-radius:8px}
+
+/* Soft uses rounded groups, lighter borders and a tinted greeting panel. */
+html[data-style=soft]{
+ --bg:#edf3ef;--card:#fbfdfb;--line:#d5e1d9;--ink:#21362e;--muted:#52665b;--soft:#e3eee8;
+ --style-panel:#e0ede4;--style-tile:#e9f2ec;--style-depth:0 5px 19px #234c3110;
+}
+html[data-color-mode=dark][data-style=soft]{
+ --bg:#101417;--card:#202b2a;--line:#435653;--ink:#edf6f2;--muted:#c1d2cb;--soft:#2b3c38;
+ --night-raised:#293936;--night-accent:#354d45;--style-panel:#1d312b;--style-tile:#293b35;--style-depth:0 5px 19px #0003;
+}
+html[data-style=soft] .card{border-radius:26px;box-shadow:var(--style-depth)}
+html[data-style=soft] #today .today-hero{
+ margin:7px auto 10px;width:calc(100% - 28px);max-width:652px;
+ padding:15px 17px 12px;border-radius:23px;background:var(--style-panel);color:var(--ink);
+}
+html[data-style=soft] #today .today-hero .d1{border-radius:20px;background:var(--card);color:var(--green);padding:4px 8px}
+html[data-style=soft] #today #homeGreeting{font-size:clamp(22px,6vw,29px);margin-top:3px}
+html[data-style=soft] #today .home-services-card{padding:14px;background:var(--card)}
+html[data-style=soft] #today .home-service-item{
+ min-height:67px;background:var(--style-tile);color:var(--ink);border-radius:19px;
+}
+html[data-style=soft] #today .home-service-icon{background:transparent;color:var(--green)}
+html[data-style=soft] #settings .settings-group{padding-inline:16px}
+html[data-style=soft] :is(.cx-course-trigger,.topbar>button){border-radius:16px}

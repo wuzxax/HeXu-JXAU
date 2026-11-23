@@ -1,0 +1,8 @@
+.route-motion-out{position:fixed;inset:0;z-index:26;overflow:hidden;background:var(--bg);pointer-events:none;contain:layout paint;will-change:transform}
+.route-motion-in{z-index:27!important;isolation:isolate;min-height:100dvh;background:var(--bg);will-change:transform;box-shadow:-10px 0 32px #153a2910}
+.route-motion-position{position:relative!important}
+.route-motion-out.route-motion-return{z-index:29}
+.route-motion-nav{z-index:28!important;pointer-events:none}
+body.route-motion-active{overflow-x:clip}
+.calendar-week-actions{flex-wrap:wrap}.calendar-week-actions button[aria-pressed=true]{background:var(--green);color:#fff;border-color:var(--green)}
+@media(prefers-reduced-motion:reduce){.route-motion-in{will-change:auto}}

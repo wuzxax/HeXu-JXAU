@@ -1,0 +1,14 @@
+/build/
+__pycache__/
+*-classes/
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.key
+*.pem
+*.dpapi
+*.har
+*.apk
+*.idsig
+.env*

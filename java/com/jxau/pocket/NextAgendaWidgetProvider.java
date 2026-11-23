@@ -1,0 +1,1 @@
+package com.jxau.pocket;public final class NextAgendaWidgetProvider extends AgendaWidgetProvider {}

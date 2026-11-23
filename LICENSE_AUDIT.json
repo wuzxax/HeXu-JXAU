@@ -1,0 +1,48 @@
+[
+  {
+    "repository": "feitangyuan/onetake",
+    "license": "PolyForm Noncommercial 1.0.0",
+    "licenseBlob": "51071c357084b2f8c5b427baffcc3ea0d2ad72ad",
+    "licenseUrl": "https://github.com/feitangyuan/onetake/blob/main/LICENSE",
+    "usage": "design reference only"
+  },
+  {
+    "repository": "rdev/liquid-glass-react",
+    "license": "MIT",
+    "licenseBlob": "4088348a7ff1e19436f9c43c31f7cdcc1bf8fc7c",
+    "licenseUrl": "https://github.com/rdev/liquid-glass-react/blob/master/LICENSE",
+    "usage": "design reference only"
+  },
+  {
+    "repository": "shuding/liquid-glass",
+    "license": "MIT",
+    "licenseBlob": "0a5528e9a24a7fe18fd8bcd620d1ffb546943114",
+    "licenseUrl": "https://github.com/shuding/liquid-glass/blob/main/LICENSE",
+    "usage": "design reference only"
+  },
+  {
+    "repository": "Kyant0/AndroidLiquidGlass",
+    "license": "Apache-2.0",
+    "licenseBlob": "e29d7cc03d2595fe32466a3ff9f3d7bc75d56339",
+    "licenseUrl": "https://github.com/Kyant0/AndroidLiquidGlass/blob/kmp/LICENSE",
+    "usage": "design reference only"
+  },
+  {
+    "repository": "https://github.com/Sec-ant/zxing-wasm",
+    "license": "MIT",
+    "version": "3.1.7",
+    "usage": "bundled local QR decoder; license in assets/js/vendor/licenses/zxing-wasm-LICENSE.txt"
+  },
+  {
+    "repository": "https://github.com/zxing-cpp/zxing-cpp",
+    "license": "Apache-2.0",
+    "version": "bundled by zxing-wasm 3.1.7",
+    "usage": "bundled local QR decoder; license in assets/js/vendor/licenses/zxing-cpp-LICENSE.txt"
+  },
+  {
+    "repository": "https://github.com/zint/zint",
+    "license": "BSD-3-Clause",
+    "version": "bundled by zxing-wasm 3.1.7",
+    "usage": "bundled local QR decoder; license in assets/js/vendor/licenses/zint-LICENSE.txt"
+  }
+]

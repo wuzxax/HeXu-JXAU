@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<script>window.__VER__="3.4.97";window.__BUILD__="由构建脚本写入";</script>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#f5f6f8">
+<title>禾序</title>
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/refresh.css">
+<link rel="stylesheet" href="css/wallets.css">
+<link rel="stylesheet" href="css/features.css">
+<link rel="stylesheet" href="css/appearance.css">
+<link rel="stylesheet" href="css/calendar.css">
+<link rel="stylesheet" href="css/proposal.css">
+<link rel="stylesheet" href="css/support.css">
+<script>try{var a=JSON.parse(localStorage.getItem("jxauAppearance")||"{}");document.documentElement.dataset.style=["campus","reading","soft"].includes(a.style)?a.style:"campus";document.documentElement.dataset.glass=a.enabled===false?"off":["real","natural","gentle"].includes(a.glass)?a.glass:"natural";}catch(e){}</script>
+<link rel="stylesheet" href="css/confirm.css">
+<link rel="stylesheet" href="css/route-motion.css">
+<link rel="stylesheet" href="css/surfaces.css">
+<link rel="stylesheet" href="css/planner.css">
+<link rel="stylesheet" href="css/overlay-scroll.css">
+<link rel="stylesheet" href="css/night-glass.css">
+<link rel="stylesheet" href="css/interface-styles.css">
+<script src="js/color-mode.js"></script>
+</head>
+<body>
+
+<div id="login" class="hidden">
+  <div class="login-box">
+    <div class="login-emblem" aria-hidden="true"><img class="app-brand-icon" src="img/hexu-icon.png" alt=""></div>
+    <div class="logo">禾序</div>
+    <div class="sub">江西农业大学 · 教务课表</div>
+    <p class="login-guide">用学号和学校统一身份认证密码登录。验证码填写图片中的计算结果，点图片可换一张。</p>
+
+    <div class="field">
+      <label for="u">学号</label>
+      <input id="u" inputmode="numeric" autocomplete="username" placeholder="学号">
+    </div>
+    <div class="field">
+      <label for="p">密码</label>
+      <div class="password-field"><input id="p" type="password" autocomplete="off" placeholder="统一身份认证密码"><button id="passwordToggle" class="password-toggle" type="button" aria-label="显示密码" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/><path class="password-eye-slash" d="m4 4 16 16" hidden/></svg></button></div>
+    </div>
+    <div class="field">
+      <label for="c">验证码</label>
+      <div class="captcha-row">
+        <input id="c" inputmode="numeric" placeholder="看图填结果">
+        <img id="cap" alt="验证码" title="点击换一张">
+      </div>
+    </div>
+
+    <p class="preference-note">登录成功后，账号与密码自动加密保存在本机。</p><p id="savedPasswordHint" class="preference-note"></p>
+    <button id="loginBtn">登录</button>
+    <div id="err" class="err"></div>
+
+  </div>
+</div>
+
+<div id="today" class="hidden has-tabbar">
+  <div class="home-brand"><div class="brand-lockup"><span class="brand-symbol" aria-hidden="true"><img class="app-brand-icon" src="img/hexu-icon.png" alt=""></span><span>禾序</span></div><button id="homeAccount" class="avatar-button" aria-label="设置头像"><span data-icon="user" aria-hidden="true"></span></button></div>
+  <div class="today-hero">
+    <div class="d1" id="tdWeek">第 1 周</div>
+    <div class="d2" id="tdDate">—</div><h1 id="homeGreeting">你好，江农er</h1>
+    <div class="d3" id="tdTip">—</div>
+  </div>
+
+  <div id="tdNowWrap" class="hidden">
+    <div class="less-now">
+      <div class="live-caption"><span></span> 正在进行</div>
+      <div class="nm" id="tdNowName"></div>
+      <div class="rm" id="tdNowRoom"></div>
+      <div class="pbar"><i id="tdBar" style="width:0%"></i></div>
+      <div class="ptxt" id="tdProg"></div>
+    </div>
+  </div>
+
+  <div class="elec-body dashboard">
+    <div id="homeRefreshStatus" class="refresh-feedback hidden" role="status" aria-live="polite"></div>
+    <div class="card today-courses">
+      <div class="section-heading"><h2>今日课表 <span id="tdCourseCount" class="count-badge">—</span></h2><button id="tdViewSchedule" class="text-button">整周课表 <span aria-hidden="true">↗</span></button></div>
+      <div id="tdNextClass" class="next-class-note" role="status" aria-live="polite"></div>
+      <div id="tdList" style="margin-top:6px"></div>
+      <div class="today-course-actions"><button type="button" id="tdRefresh" class="text-button"><span data-icon="refresh" aria-hidden="true"></span><span class="gt">刷新课表</span></button></div>
+    </div>
+
+    <div id="guidePrompt" class="card guide-prompt hidden">
+      <button type="button" id="openFirstUseGuide" class="settings-row settings-link"><span><b>第一次用禾序？</b><small>看看怎么查作业、添加日程和绑定 798</small></span><span aria-hidden="true">›</span></button>
+      <button type="button" id="dismissGuidePrompt" class="text-button" aria-label="关闭首次使用提示">关闭</button>
+    </div>
+
+    <section class="card home-services-card" aria-labelledby="homeServicesTitle">
+      <div class="section-heading"><h2 id="homeServicesTitle">常用服务</h2></div>
+      <div class="home-service-grid">
+        <button type="button" class="home-service-item" id="svcGrades"><span class="home-service-icon" data-icon="calendar" aria-hidden="true"></span><span>成绩查询</span></button>
+        <button type="button" class="home-service-item" id="svcParcels"><span class="home-service-icon" data-icon="package" aria-hidden="true"></span><span>快递取件</span></button>
+        <button type="button" class="home-service-item" id="svcLib"><span class="home-service-icon" data-icon="book" aria-hidden="true"></span><span>图书馆</span></button>
+      </div>
+    </section>
+
+    <div class="card balances-card">
+      <div class="section-heading"><h2>校园钱包</h2><div class="home-water-choice"><button id="homeWaterMode" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="homeWaterMenu"><span>798余额</span><span aria-hidden="true">⌄</span></button><div id="homeWaterMenu" class="home-water-menu hidden" role="menu" aria-label="首页用水卡片内容"><button type="button" role="menuitemradio" data-water-mode="balance" aria-checked="true">798余额<span aria-hidden="true">✓</span></button><button type="button" role="menuitemradio" data-water-mode="spending" aria-checked="false">用水花费<span aria-hidden="true">✓</span></button></div></div></div>
+      <div class="balance-grid" style="margin-top:10px">
+        <button id="tdElecBalance" class="balance-tile" type="button"><span class="lbl">空调电费</span><span class="balance-value" id="tdElecMoney">—</span></button>
+        <button id="tdLighting" class="balance-tile" type="button"><span class="lbl">照明电费 ↗</span><span class="balance-value unavailable" id="tdLightingMoney">打开完美校园</span></button>
+        <button id="tdWater" class="balance-tile" type="button"><span class="lbl" id="tdWaterLabel">798钱包</span><span class="balance-value unavailable" id="tdWaterMoney">未绑定</span><span id="tdWaterName" class="balance-note"></span><span id="tdWaterCache" class="balance-note"></span></button>
+      </div>
+      <div id="homeWaterSummary" class="home-water-summary hidden" role="status"></div>
+    </div>
+  </div>
+</div>
+
+<div id="chaoxing" class="hidden has-tabbar">
+ <div class="topbar"><div class="t"><button id="chaoxingBack" class="backbtn" aria-label="返回主页">‹</button>学习通</div><button id="chaoxingRefresh" type="button">检查一次</button></div>
+ <div class="elec-body feature-body">
+  <div class="feature-heading"><h1>学习通作业</h1><p id="chaoxingStatus" role="status" aria-live="polite">连接学习通，查看课程作业</p></div>
+  <div id="cxSummary" class="cx-summary"></div>
+  <div class="feature-filters" aria-label="筛选作业"><button type="button" class="cx-filter active" data-filter="all">全部</button><button type="button" class="cx-filter" data-filter="todo">待完成</button><button type="button" class="cx-filter" data-filter="done">已完成</button></div>
+  <div class="feature-segment" aria-label="作业排序"><button type="button" class="active" data-sort="urgent">按截止时间</button><button type="button" data-sort="course">按课程</button></div>
+  <div class="cx-course-picker"><span>课程分类</span><button id="cxCourseFilter" class="cx-course-trigger" type="button" aria-label="课程分类：全部课程" aria-haspopup="dialog" aria-controls="cxCourseDialog" aria-expanded="false"><span id="cxCourseFilterLabel">全部课程</span><span class="cx-course-chevron" aria-hidden="true"></span></button></div><div id="chaoxingList"></div>
+  <div class="feature-footer"><button id="chaoxingLogin" class="small-btn" type="button">绑定学习通</button><button id="chaoxingDisconnect" class="text-button hidden" type="button">断开连接</button></div>
+  <p class="feature-note">支持已适配作业在禾序内作答、保存草稿并确认提交；特殊题型或额外验证请在学习通完成。</p>
+ </div>
+</div>
+<div id="cxWork" class="hidden">
+ <div class="topbar"><div class="t"><button id="cxWorkBack" class="backbtn" aria-label="返回作业列表">‹</button>作业</div><button id="cxWorkReload" type="button">重新读取</button></div>
+ <div class="elec-body feature-body cx-work-body"><section class="card cx-work-head"><span id="cxWorkCourse" class="feature-eyebrow"></span><h1 id="cxWorkTitle">正在读取…</h1><p id="cxWorkMeta" class="lbl"></p></section><p id="cxWorkStatus" role="status" aria-live="polite"></p><div id="cxWorkQuestions"></div><div id="cxWorkActions" class="card cx-work-actions hidden"><p id="cxWorkProgress"></p><div><button id="cxWorkSave" type="button">保存草稿</button><button id="cxWorkSubmit" type="button">提交作业</button></div></div><button id="cxWorkCheck" class="small-btn hidden" type="button">核对提交状态</button><p class="feature-note">保存草稿不会交卷；正式提交前需要确认。遇到特殊题型或验证要求，请在学习通完成。</p></div>
+</div>
+<dialog id="cxCourseDialog" class="cx-course-dialog" aria-labelledby="cxCourseDialogTitle">
+ <div class="cx-course-dialog-head"><h2 id="cxCourseDialogTitle">选择课程</h2><button id="cxCourseClose" type="button" autofocus>关闭</button></div>
+ <div id="cxCourseOptions" class="cx-course-options" role="group" aria-label="课程列表"></div>
+</dialog>
+<div id="cxLoginDialog" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="cxLoginTitle">
+ <form id="cxLoginForm" class="modal-box"><div id="cxLoginTitle" class="h">连接学习通</div><label for="cxUser">手机号 / 学号</label><input id="cxUser" autocomplete="username" required><label for="cxPass">学习通密码</label><input id="cxPass" type="password" required><div id="cxLoginError" class="err" role="status"></div><div class="modal-btns"><button id="cxLoginCancel" type="button" class="cancel">取消</button><button id="cxLoginSubmit" type="submit" class="ok">连接</button></div></form>
+</div>
+<div id="waterDevice" class="hidden has-tabbar">
+ <div class="topbar main-heading"><div class="t">接水</div><button id="waterDeviceRefresh" type="button">刷新</button></div>
+ <div class="elec-body feature-body">
+  <aside id="waterLoginAlert" class="water-login-note hidden" role="status">
+   <b id="waterLoginTitle">798 尚未登录，无法发出接水请求</b>
+   <p id="waterLoginNotice">在禾序登录 798 后，慧生活798 App 会退出登录。再次使用官方 App 时需重新登录。</p>
+   <button id="waterLoginAction" class="text-button" type="button">登录 798 <span aria-hidden="true">›</span></button>
+  </aside>
+  <section class="card water-balance-card"><div class="water-balance-header"><button id="waterBalanceToggle" class="balance-fold" type="button" aria-expanded="true" aria-controls="waterBalanceBody"><span>水卡余额</span><span class="fold-caption">收起 ⌃</span></button><button id="waterAccountFolded" class="text-button hidden" type="button">账号管理 ›</button></div><div id="waterBalanceBody"><div class="section-heading"><h2>校园用水余额</h2><span id="waterBalanceTime" class="lbl">—</span></div><div id="waterBalance" class="water-balance">—</div><div id="waterWalletName" class="lbl"></div><button id="waterManage" class="text-button" type="button">账号与钱包管理 ›</button></div></section>
+  <section class="card water-devices-card"><div class="water-devices-header"><button id="waterDevicesToggle" type="button" class="balance-fold" aria-expanded="true" aria-controls="waterDevicesBody"><span>我的饮水机 <small id="waterDeviceCount" class="lbl">—</small></span><span class="fold-caption">收起 ⌃</span></button></div><div id="waterDevicesBody"><div id="waterDeviceList"></div><div class="water-device-heading water-device-toolbar"><button id="waterScan" type="button" class="text-button" aria-label="扫码添加设备">▣ 扫码添加</button><button id="waterDeviceAdd" type="button" class="text-button" aria-label="手动输入设备号">＋ 手动输入</button></div><div id="waterDeviceStatus" class="lbl" role="status" aria-live="polite" tabindex="0"></div><a class="water-widget-link" href="jxau-pocket://water/widget">添加接水桌面小组件 ↗</a></div></section>
+  <section class="card water-stats-card" aria-labelledby="waterStatsTitle">
+   <div class="section-heading"><div><h2 id="waterStatsTitle">用水花费</h2><p class="water-stats-sub">饮水与洗浴，分开看更清楚</p></div><button id="waterStatsRefresh" class="text-button" type="button">更新统计</button></div>
+   <p id="waterStatsStatus" class="water-stats-status" role="status" aria-live="polite">正在读取消费统计…</p>
+   <div class="water-spend-group" role="button" tabindex="0" data-water-category="drink" aria-label="查看饮水消费统计详情"><div class="water-spend-heading"><span class="water-spend-dot drink"></span><h3>饮水</h3><span>查看趋势 ›</span></div><div id="waterDrinkStats" class="water-spend-grid"><div><span>今日</span><strong>—</strong></div><div><span>本周</span><strong>—</strong></div><div><span>本月</span><strong>—</strong></div></div></div>
+   <p id="waterDrinkVolume" class="water-volume">今日饮水量待统计</p><div class="water-spend-group bath" role="button" tabindex="0" data-water-category="bath" aria-label="查看洗浴消费统计详情"><div class="water-spend-heading"><span class="water-spend-dot bath"></span><h3>洗浴</h3><span>查看趋势 ›</span></div><div id="waterBathStats" class="water-spend-grid"><div><span>次均</span><strong>—</strong><small>本月每笔</small></div><div><span>本周</span><strong>—</strong></div><div><span>本月</span><strong>—</strong></div></div></div>
+   <div class="water-spend-compare"><div class="water-compare-title"><span>本月花费构成</span><b id="waterMonthTotal">—</b></div><div id="waterSpendBar" class="water-spend-bar" aria-hidden="true"></div><p id="waterSpendLegend" class="water-spend-legend"></p></div>
+   <details class="water-stats-method"><summary>统计范围与说明</summary><p id="waterStatsScope">按当前798账号全部钱包的实际支付金额统计，不含充值、退款与积分抵扣。周从周一开始，月按自然月，均使用校园时间。</p><p>类别依据账单和设备名称识别；无法判断的费用单列为“待分类”，不会混入饮水或洗浴。</p></details>
+  </section>
+  <section class="card water-history-card"><div class="section-heading"><h2>消费明细</h2><button id="waterHistoryLoad" class="text-button" type="button" aria-expanded="false" aria-controls="waterHistoryPanel">查看明细 ⌄</button></div><div id="waterHistoryPanel" class="hidden"><div id="waterHistoryList" role="status" aria-live="polite"></div><div class="water-history-pages"><button id="waterHistoryPrev" class="small-btn" type="button">上一页</button><span id="waterHistoryPage">第 1 页</span><button id="waterHistoryNext" class="small-btn" type="button">下一页</button></div><button id="waterHistoryClose" class="text-button" type="button">收起明细 ⌃</button></div></section>
+  <p class="feature-note">接水会实际扣费，确认设备后再开始，完成后点击“结束接水”。设备可在本页保存；充值、签约和设备使用权限请在慧生活798完成。</p>
+ </div>
+</div>
+
+<div id="waterSpendingDetail" class="hidden">
+ <div class="topbar"><button id="waterDetailBack" type="button">‹ 接水</button><div id="waterDetailTitle" class="t">消费统计</div><button id="waterDetailReload" type="button">重读</button></div>
+ <div class="elec-body feature-body">
+  <div class="water-detail-tabs" role="group" aria-label="消费类别"><button type="button" data-detail-category="drink">饮水</button><button type="button" data-detail-category="bath">洗浴</button></div>
+  <div class="card water-detail-card">
+   <div class="water-detail-tabs" role="group" aria-label="统计周期"><button type="button" data-water-period="day">日</button><button type="button" data-water-period="week">周</button><button type="button" data-water-period="month">月</button></div>
+   <div class="water-date-nav"><button id="waterDetailPrev" type="button" aria-label="上一个周期">‹</button><label><span id="waterDetailRange">选择日期</span><input id="waterDetailDate" type="date" aria-label="选择统计日期"></label><button id="waterDetailNext" type="button" aria-label="下一个周期">›</button></div>
+   <p id="waterDetailStatus" class="water-stats-status" role="status" aria-live="polite"></p>
+   <div id="waterDetailTotals" class="water-detail-totals"></div>
+   <h2 class="water-chart-title">花费趋势 <small id="waterChartUnit">元</small></h2><div id="waterDetailChart" class="water-detail-chart"></div><p id="waterChartSelected" class="water-stats-status">点击柱形查看当日花费</p>
+  </div>
+  <section class="card water-detail-card"><div class="section-heading"><h2>本期明细</h2><span id="waterDetailCount" class="lbl"></span></div><div id="waterDetailList"></div><button id="waterDetailMore" type="button" class="text-button hidden">显示更多明细</button></section>
+  <p id="waterDetailScope" class="feature-note"></p>
+ </div>
+</div>
+
+
+<div id="waterDeviceDialog" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="waterDeviceDialogTitle">
+ <form id="waterDeviceForm" class="modal-box"><span id="waterEntryCaption" class="water-entry-caption">手动输入设备号</span><div id="waterDeviceDialogTitle" class="h">添加饮水机</div><p class="feature-note">输入机器上的设备编号，或粘贴二维码链接。保存一次后可直接点击接水；保存不会启动设备。</p><div class="water-entry-switch"><span>机器上有二维码？</span><button id="waterEditorScan" type="button">改用扫码添加 ↗</button></div><label for="waterDeviceId">设备号 / 二维码链接</label><input id="waterDeviceId" maxlength="4096" autocomplete="off" autocapitalize="off" spellcheck="false" required placeholder="例如 D8821，或粘贴二维码内容"><label for="waterDeviceAlias">设备名称（选填）</label><input id="waterDeviceAlias" maxlength="40" autocomplete="off" placeholder="例如：6号楼一楼东"><p class="feature-note">设备保存在本机，按798账号分别管理。</p><div id="waterDeviceError" class="err" role="status" aria-live="polite"></div><div class="modal-btns"><button id="waterDeviceCancel" type="button" class="cancel">取消</button><button id="waterDeviceSave" type="submit" class="ok">保存设备</button></div><button id="waterDeviceRemove" type="button" class="device-remove hidden">从本机移除</button></form>
+</div>
+
+<div id="grades" class="hidden">
+  <div class="topbar"><div class="t"><button id="gradesBack" class="backbtn" aria-label="返回主页">‹</button>成绩查询</div><button id="gradesRefresh" class="text-button" type="button">刷新</button></div>
+  <div class="elec-body grades-body">
+    <div class="grades-heading"><span class="grades-eyebrow">教务成绩</span><h1>我的成绩</h1><p>查看学校教务系统公布的课程成绩</p></div>
+    <div id="gradesStatus" class="grades-status" role="status" aria-live="polite"></div>
+    <div id="gradesTools" class="grades-tools hidden"><label for="gradesTerm">学期</label><select id="gradesTerm" aria-label="筛选学期"></select><span id="gradesCount"></span></div>
+    <div id="gradesList"></div>
+    <button id="gradesLogin" class="elec-btn hidden" type="button">前往登录</button>
+    <p class="grades-footnote">成绩以教务系统公布为准；尚未公布的课程不会显示。成绩仅在当前页面临时展示。</p>
+  </div>
+</div>
+
+<div id="parcels" class="hidden">
+  <div class="topbar"><div class="t"><button id="parcelsBack" class="backbtn" aria-label="返回主页">‹</button>快递取件</div></div>
+  <div class="elec-body parcel-body">
+    <p class="parcel-summary">身份码与包裹信息在官方 App 内查看</p>
+    <div class="parcel-platform-list"><div class="parcel-platform-card" data-platform="cainiao"><div class="parcel-platform-name"><span class="parcel-platform green">菜</span><b>菜鸟</b></div><div class="parcel-actions"><a href="jxau-pocket://parcel/open/cainiao" class="parcel-action identity">身份码 <span aria-hidden="true">↗</span></a></div></div><div class="parcel-platform-card" data-platform="taobao"><div class="parcel-platform-name"><span class="parcel-platform orange">淘</span><b>淘宝</b></div><div class="parcel-actions"><a href="jxau-pocket://parcel/open/taobao" class="parcel-action identity">身份码 <span aria-hidden="true">↗</span></a><a href="jxau-pocket://parcel/open/taobao_pending" class="parcel-action pending">待取快递 <span aria-hidden="true">↗</span></a></div></div><div class="parcel-platform-card" data-platform="pinduoduo"><div class="parcel-platform-name"><span class="parcel-platform red">拼</span><b>拼多多</b></div><div class="parcel-actions"><a href="jxau-pocket://parcel/open/pinduoduo" class="parcel-action identity">身份码 <span aria-hidden="true">↗</span></a><a href="jxau-pocket://parcel/open/pinduoduo_pending" class="parcel-action pending">待取快递 <span aria-hidden="true">↗</span></a></div></div><div class="parcel-platform-card" data-platform="jd"><div class="parcel-platform-name"><span class="parcel-platform gold">京</span><b>京东</b></div><div class="parcel-actions"><a href="jxau-pocket://parcel/open/jd" class="parcel-action pending">订单 / 物流 <span aria-hidden="true">↗</span></a></div></div><div class="parcel-platform-card" data-platform="xhs"><div class="parcel-platform-name"><span class="parcel-platform pink">书</span><b>小红书</b></div><div class="parcel-actions"><a href="jxau-pocket://parcel/open/xhs" class="parcel-action pending">订单 / 物流 <span aria-hidden="true">↗</span></a></div></div></div>
+    <details class="parcel-options"><summary>桌面快捷方式</summary><div class="parcel-shortcuts"><a class="parcel-pin" href="jxau-pocket://parcel/pin/cainiao">菜鸟身份码 ＋</a><a class="parcel-pin" href="jxau-pocket://parcel/pin/taobao">淘宝身份码 ＋</a><a class="parcel-pin" href="jxau-pocket://parcel/pin/pinduoduo">拼多多身份码 ＋</a></div><p>需要 Android 8.0 以上及桌面支持，请确认系统提示。</p></details>
+    <details class="parcel-options"><summary>使用说明</summary><p>身份码和数字取件信息以官方平台为准。京东、小红书打开订单页；小红书网页备用入口是首页。未安装、未登录或链接失效时，可能进入官方网页或 App 首页。</p></details>
+  </div>
+</div>
+
+<div id="schedule" class="hidden has-tabbar">
+  <div class="topbar main-heading">
+    <div class="t">课表</div>
+    <div class="actions">
+      <button id="planTools" aria-label="调休、导出与课表工具">工具</button><button id="btnAdd2">＋ 添加</button>
+    </div>
+  </div>
+
+  <div class="weekbar">
+    <div id="weekLabel">第 1 周</div>
+    <div id="scheduleSource" class="schedule-source" role="status"></div>
+    <div id="semesterCacheStatus" class="semester-cache-status" role="status" aria-live="polite"></div>
+  </div>
+
+  <div id="scheduleFeedback" class="refresh-feedback hidden" role="status" aria-live="polite"></div>
+  <div class="table-wrap" aria-live="polite">
+    <div class="pages" id="pages">
+      <div class="page" id="pgL"></div>
+      <div class="page" id="pgC"></div>
+      <div class="page" id="pgR"></div>
+    </div>
+  </div>
+
+  <div id="detailMask" class="mask hidden"></div>
+  <section class="detail" id="detail" role="dialog" aria-modal="true" aria-labelledby="courseSheetTitle" aria-hidden="true"></section>
+  <div class="toast" id="toast"></div>
+
+  <div class="foot">
+    <button id="btnAdd">＋ 添加课程</button>
+    <button id="btnToday">回到本周</button>
+    <button id="btnReload">刷新</button>
+  </div>
+</div>
+
+<div id="elec" class="hidden settings-subpage">
+  <div class="topbar">
+    <button id="elecBack">‹ 返回</button>
+    <div class="t">空调电费</div>
+    <button id="elecRefresh">刷新</button>
+  </div>
+  <div id="elecBody" class="elec-body"></div>
+</div>
+
+<div id="library" class="hidden has-tabbar">
+  <div class="topbar">
+    <button id="libBack">‹ 返回</button>
+    <div class="t">图书馆</div>
+    <button id="libRefresh">刷新</button>
+  </div>
+
+
+  <div class="lib-tabbar library-tabs">
+    <button id="tabSearch" class="lib-tab active" aria-pressed="true">
+      <span style="font-size:18px;display:block;line-height:1.1">🔍</span>搜索
+    </button>
+    <button id="tabHot" class="lib-tab" aria-pressed="false">
+      <span style="font-size:18px;display:block;line-height:1.1">🔥</span>热门
+    </button>
+    <button id="tabMine" class="lib-tab" aria-pressed="false">
+      <span style="font-size:18px;display:block;line-height:1.1">📚</span>我的借阅
+    </button>
+  </div>
+
+  <!-- 搜索视图 -->
+  <div id="libSearchView" class="elec-body" style="padding-bottom:80px">
+    <div class="card">
+      <input id="libQ" class="elec-input" placeholder="搜书名 / 作者 / 关键词" style="margin-top:0">
+      <button id="libSearch" class="elec-btn">搜索</button>
+    </div>
+    <div id="libResults" style="padding:0 4px"></div>
+    <div id="libHome"></div>
+  </div>
+
+  <!-- 热门视图 -->
+  <div id="libCatView" class="elec-body hidden" style="padding-bottom:80px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin:4px 4px 10px">
+      <span class="lbl" style="font-weight:600;font-size:15px;color:#1d2521">热门借阅</span>
+      <span id="libHotRefresh" style="font-size:12px;color:#1a5c3a;cursor:pointer">换一批</span>
+    </div>
+    <div id="libHot" style="padding:0 4px"></div>
+  </div>
+
+  <!-- 我的借阅视图 -->
+  <div id="libMineView" class="elec-body hidden" style="padding-bottom:80px">
+    <div class="card">
+      <div class="row2">
+        <div><div class="lbl">借阅中</div><div class="mid" id="libCount">-</div></div>
+        <div><div class="lbl">欠款</div><div class="mid" id="libMoney">-</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="lbl" style="font-weight:600;font-size:15px;color:#1d2521">借阅中的书</div>
+      <div id="libBorrow" style="margin-top:10px"></div>
+    </div>
+    <div class="card">
+      <a href="https://findjxau.libsp.cn/" style="display:block;text-align:center;padding:12px 0;color:#1a5c3a;font-size:14px;font-weight:600;text-decoration:none;border-radius:10px;background:#eef2f0">打开图书馆官网（借阅 / 续借）</a>
+    </div>
+  </div>
+
+  <!-- 书目详情（App 内） -->
+  <div id="bookDetail" class="hidden settings-subpage book-detail">
+    <div class="topbar">
+      <button id="bdBack" type="button">‹ 图书馆</button>
+      <div class="t">书目详情</div>
+      <span class="settings-header-space" aria-hidden="true"></span>
+    </div>
+    <div class="elec-body feature-body book-detail-body">
+      <div class="card book-detail-summary">
+          <div id="bdCover" class="book-detail-cover"></div>
+          <div class="book-detail-meta">
+            <h1 id="bdTitle"></h1>
+            <p id="bdSub"></p>
+            <p id="bdIsbn"></p>
+          </div>
+      </div>
+      <section class="card book-detail-section hidden" id="bdSynopsis" aria-labelledby="bdSynopsisTitle">
+        <h2 id="bdSynopsisTitle">简介</h2>
+        <div id="bdAbs"></div>
+      </section>
+      <section class="card book-detail-section" aria-labelledby="bdHoldTitle">
+        <h2 id="bdHoldTitle">馆藏</h2>
+        <div id="bdHold" aria-live="polite"></div>
+      </section>
+    </div>
+  </div>
+
+</div>
+
+<div id="settings" class="hidden has-tabbar">
+  <div class="topbar main-heading">
+    <div class="t">我的<small>按你的习惯，设置校园生活</small></div>
+    <div style="width:60px"></div>
+  </div>
+  <div class="elec-body settings-body">
+    <div class="card account-card"><span class="account-mark" data-icon="user" aria-hidden="true"></span><div><span class="settings-caption">校园账号</span><div id="setUser">—</div></div></div>
+    <div class="settings-caption group-label">偏好设置</div>
+    <div class="card settings-group">
+      <button type="button" id="openAppearanceSettings" class="settings-row settings-link"><span><b>界面与质感</b><small>界面风格 · 液态玻璃 · 点触光感</small></span><span aria-hidden="true">›</span></button>
+      <button type="button" id="openSchedulePreferences" class="settings-row settings-link"><span><b>课表设置</b><small>早检、晚自习与其他课表设置</small></span><span aria-hidden="true">›</span></button>
+    </div>
+    <div class="settings-caption group-label">应用</div>
+    <div class="card settings-group">
+      <button type="button" id="openUsageGuide" class="settings-row settings-link"><span><b>登录与使用指南</b><small>校园账号 · 课表 · 学习通与接水</small></span><span aria-hidden="true">›</span></button>
+      <button type="button" id="openFeedback" class="settings-row settings-link"><span><b>问题与建议反馈</b><small>加入禾序反馈群 · 一起把禾序变得更好</small></span><span aria-hidden="true">›</span></button>
+      <button type="button" id="openNotices" class="settings-row settings-link"><span><b>开源声明与致谢</b><small>第三方许可 · 设计参考</small></span><span aria-hidden="true">›</span></button>
+<button type="button" id="diagEntry" class="settings-row settings-link"><span><b>自检诊断</b><small>检查数据源连接状态</small></span><span class="settings-chevron" aria-hidden="true">›</span></button>
+      <div class="settings-row settings-version"><span>版本号</span><span id="setVer">—</span></div>
+    </div>
+    <button type="button" id="forgetPassword" class="settings-row settings-link hidden"><span><b>删除已保存的校园密码</b><small>保留当前登录状态，过期后需重新输入</small></span><span aria-hidden="true">›</span></button>
+    <button id="btnLogout" class="settings-logout" type="button">退出登录</button>
+  </div>
+</div>
+
+<div id="usageGuide" class="hidden settings-subpage">
+  <div class="topbar"><button id="usageGuideBack" type="button">‹ 返回</button><div class="t">登录与使用指南</div><span class="settings-header-space" aria-hidden="true"></span></div>
+  <div class="elec-body settings-body guide-body">
+    <section class="card guide-section" aria-labelledby="guideCampus">
+      <h2 id="guideCampus">校园账号</h2>
+      <p>用学号和学校统一身份认证密码登录，输入图片中算式的结果。课表刷新、成绩查询和个人借阅记录需要有效的校园登录状态。</p>
+      <p>登录过期后，可点首页「刷新课表」，或到「我的 → 账号与绑定」重新登录。已缓存的课表可离线查看。</p>
+    </section>
+    <section class="card guide-section" aria-labelledby="guideSchedule">
+      <h2 id="guideSchedule">课表与日程</h2>
+      <p>左右滑动切换周次，点课程看详情。点课表空白处或「＋ 添加」新建日程；点已有日程可编辑。</p>
+      <p>在「工具」里可以调休、补课、导出课表或添加桌面组件。课程上岛可在「我的 → 课表设置」开启并试发。</p>
+      <button type="button" class="text-button" data-guide-route="schedule">查看课表 <span aria-hidden="true">›</span></button>
+    </section>
+    <section class="card guide-section" aria-labelledby="guideHomework">
+      <h2 id="guideHomework">学习通作业</h2>
+      <p>在「学习通」点「绑定学习通」，用学习通手机号或学号和密码连接。作业可按截止时间或课程查看，点作业进入详情。</p>
+      <button type="button" class="text-button" data-guide-route="chaoxing">打开学习通 <span aria-hidden="true">›</span></button>
+    </section>
+    <section class="card guide-section" aria-labelledby="guideWater">
+      <h2 id="guideWater">798 接水与花费</h2>
+      <p>进入「接水 → 账号与钱包管理」，输入 798 手机号，先完成图形验证码，再用短信验证码绑定。收起余额时可点「账号管理」。</p>
+      <p>扫饮水机上的设备码或手动输入编号，保存后点设备卡片上的「接水」。发出请求后在水机上确认，用完点「结束」。饮水和洗浴花费可分别查看趋势。</p>
+      <button type="button" class="text-button" data-guide-route="waterDevice">前往接水 <span aria-hidden="true">›</span></button>
+    </section>
+    <section class="card guide-section" aria-labelledby="guideServices">
+      <h2 id="guideServices">常用校园服务</h2>
+      <p>首页可查成绩、打开快递取件入口，也能进入图书馆搜书和查看借阅记录。校园钱包可查看空调电费，并打开完美校园缴费。</p>
+      <button type="button" class="text-button" data-guide-route="library">前往图书馆 <span aria-hidden="true">›</span></button>
+    </section>
+  </div>
+</div>
+
+<div id="feedback" class="hidden settings-subpage"><div class="topbar"><button id="feedbackBack" type="button">‹ 我的</button><div class="t">问题与建议反馈</div><span class="settings-header-space" aria-hidden="true"></span></div><div class="feedback-body"><div class="feedback-intro"><h1>一起，让禾序更好用</h1><p>遇到问题或有改进建议，欢迎加入 QQ 反馈群交流，也可在群内获取最新版本。</p></div><div class="feedback-contact"><label>QQ 反馈群<input id="feedbackGroup" readonly value="1136772068" aria-label="反馈QQ群号"></label><button id="feedbackCopy" type="button">复制群号</button></div><p class="feedback-hint">复制群号后，在 QQ 中搜索并申请加入。反馈时请附上问题页面、操作步骤和版本号，方便定位。</p></div></div>
+<div id="appearanceSettings" class="hidden settings-subpage"><div class="topbar"><button id="appearanceSettingsBack" type="button">‹ 我的</button><div class="t">界面与质感</div><span class="settings-header-space" aria-hidden="true"></span></div><div class="elec-body settings-body">    <section class="card appearance-settings" aria-label="界面风格设置">
+      <fieldset class="theme-setting"><legend>夜间模式</legend><div class="theme-options" role="group" aria-label="夜间模式">
+       <label><input type="radio" name="colorMode" value="system"><span>跟随系统</span></label>
+       <label><input type="radio" name="colorMode" value="light"><span>关闭</span></label>
+       <label><input type="radio" name="colorMode" value="dark"><span>开启</span></label>
+      </div></fieldset>
+      <h2>界面风格</h2>
+      <div class="style-options" role="group" aria-label="界面风格">
+        <label><input type="radio" name="uiStyle" value="campus"><span class="style-sample campus"><i></i><i></i><i></i></span><b>清爽校园</b><small>清晰分区</small></label>
+        <label><input type="radio" name="uiStyle" value="reading"><span class="style-sample reading"><i></i><i></i><i></i></span><b>极简阅读</b><small>纸感与细线</small></label>
+        <label><input type="radio" name="uiStyle" value="soft"><span class="style-sample soft"><i></i><i></i><i></i></span><b>柔和原生</b><small>圆角与柔色</small></label>
+      </div>
+      <div class="settings-row"><span><b>高级材质</b><small>为悬浮导航增加透色、模糊与边缘高光</small></span><label class="switch"><input id="glassEnabled" type="checkbox" aria-label="高级材质"><span class="slider"></span></label></div>
+      <div class="glass-preview" aria-label="玻璃材质实时预览"><span class="preview-orbit"></span><div class="preview-scene" aria-hidden="true"><b>08:00 · 高等数学</b><span>E201 · 让日常清晰可见</span></div><div class="glass-surface preview-control"><span>♡</span><span>✎</span><span>⌕</span><span>✦</span></div><small>当前效果 · <span id="glassLevelName">自然</span></small></div>
+      <fieldset class="glass-options" id="glassOptions"><legend>通透程度</legend>
+        <label><span><b>真实</b><small>最高通透 · 看清背后内容，保留高光与透色</small></span><input type="radio" name="glassLevel" value="real"></label>
+        <label><span><b>自然</b><small>轻柔模糊 · 背景与文字自然融合</small></span><input type="radio" name="glassLevel" value="natural"></label>
+        <label><span><b>柔和</b><small>更细腻的磨砂，阅读更清楚</small></span><input type="radio" name="glassLevel" value="gentle"></label>
+      </fieldset>
+      <div class="settings-row"><span><b>点触光感</b><small>轻触玻璃时，光感随指尖出现</small></span><label class="switch"><input type="checkbox" id="glassTouch" aria-label="点触光感"><span class="slider"></span></label></div>
+    </section>
+</div></div>
+<div id="schedulePreferences" class="hidden settings-subpage"><div class="topbar"><button id="schedulePreferencesBack" type="button">‹ 我的</button><div class="t">课表设置</div><span class="settings-header-space" aria-hidden="true"></span></div><div class="elec-body settings-body">    <section class="card settings-group"><button type="button" id="settingsPlanTools" class="settings-row settings-link"><span><b>调休、导出与桌面组件</b><small>单次修改、学校补课与课表分享</small></span><span>›</span></button></section><section class="card settings-group class-mode" aria-labelledby="classModeTitle">
+ <div class="settings-row class-live-heading">
+  <div><h2 id="classModeTitle">课程上岛 <span class="class-test-label">测试</span></h2><small id="classLiveDescription">在状态栏显示课程简称与教室</small></div>
+  <label class="switch"><input type="checkbox" role="switch" id="classLive" aria-label="课程上岛" disabled><span class="slider"></span></label>
+ </div>
+ <div class="class-mode-actions">
+  <a id="classNotifications" hidden href="jxau-pocket://schedule/class-permission/notifications">允许通知</a>
+  <a id="classPromotion" hidden href="jxau-pocket://schedule/class-permission/promotion">实时更新设置</a>
+  <a id="classXiaomiNotifications" hidden href="jxau-pocket://schedule/class-permission/xiaomi-notifications">超级岛通知设置</a>
+  <button id="classPreview" type="button" hidden>试发 2 分钟</button>
+ </div>
+ <p id="classLiveStatus" class="preference-note" role="status"></p>
+ <details class="class-disclosure">
+  <summary>适配机型 <span aria-hidden="true"></span></summary>
+  <div class="class-disclosure-body">
+  <dl class="class-device-list">
+   <div><dt>vivo、iQOO</dt><dd>Android 13 及以上的 OriginOS 原子岛</dd></div>
+   <div><dt>小米、Redmi、POCO、黑鲨</dt><dd>Android 13 及以上的 HyperOS 超级岛</dd></div>
+   <div><dt>OPPO、一加、真我</dt><dd>Android 16 及以上的流体云</dd></div>
+   <div><dt>其他 Android 手机</dt><dd>Android 16 及以上，需系统支持「实时更新」</dd></div>
+  </dl>
+  <p class="preference-note">具体型号和系统版本请以本机试发效果为准。</p>
+  </div>
+ </details>
+ <details class="class-disclosure class-card-options" id="classCardOptions" hidden>
+  <summary>显示设置 <span aria-hidden="true"></span></summary>
+  <div class="class-disclosure-body">
+  <form id="classLeadForm" class="class-pref-line">
+   <label for="classLead">提前上岛</label><span class="class-lead-input"><input id="classLead" type="number" min="0" max="60" value="10" inputmode="numeric" required> 分钟</span><button type="submit">保存</button>
+  </form>
+  <fieldset class="class-density"><legend>上岛时长</legend><div class="theme-options" role="group" aria-label="上岛时长">
+   <label><input type="radio" name="classDisplay" value="start"><span>到上课</span></label>
+   <label><input type="radio" name="classDisplay" value="end"><span>到下课</span></label>
+   <label><input type="radio" name="classDisplay" value="custom"><span>自定义</span></label>
+  </div></fieldset>
+  <form id="classDurationForm" class="class-pref-line" hidden>
+   <label for="classDuration">显示时长<small>从预定提示时间起算，最晚到下课</small></label><span class="class-lead-input"><input id="classDuration" type="number" min="1" max="120" value="1" inputmode="numeric" required> 分钟</span><button type="submit">保存</button>
+  </form>
+  <fieldset class="class-density"><legend>信息密度</legend><div class="theme-options" role="group" aria-label="信息密度">
+   <label><input type="radio" name="classDensity" value="compact"><span>紧凑</span></label>
+   <label><input type="radio" name="classDensity" value="standard"><span>标准</span></label>
+   <label><input type="radio" name="classDensity" value="expanded"><span>详细</span></label>
+  </div></fieldset>
+  <button id="openClassAliases" type="button" class="settings-row settings-link">
+   <span><b>课程别名</b></span><span class="settings-chevron" aria-hidden="true">›</span>
+  </button>
+  </div>
+ </details>
+</section><section class="card settings-group class-mode" aria-label="上课自动免打扰">
+ <div class="settings-row"><span><b>上课自动免打扰</b><small>按课表时段开启，安排结束后自动退出。</small></span><label class="switch"><input type="checkbox" role="switch" id="classQuiet" aria-label="上课自动免打扰" disabled><span class="slider"></span></label></div>
+ <div id="classQuietCustomRow" class="settings-row hidden"><span><b>包含自定义日程</b><small>按添加到课表的日程时间切换</small></span><label class="switch"><input type="checkbox" role="switch" id="classQuietCustom" aria-label="包含自定义日程" disabled><span class="slider"></span></label></div>
+ <div id="classQuietStudyRow" class="settings-row hidden"><span><b>包含晚自习</b><small>跟随课表里设置的星期、周次和时段</small></span><label class="switch"><input type="checkbox" role="switch" id="classQuietStudy" aria-label="包含晚自习" disabled><span class="slider"></span></label></div>
+ <div class="class-mode-actions">
+  <a id="classQuietAccess" hidden href="jxau-pocket://schedule/class-permission/quiet">授权免打扰</a>
+  <a id="classAlarmAccess" hidden href="jxau-pocket://schedule/class-permission/alarms">允许准时切换</a>
+  <a id="classRule" hidden href="jxau-pocket://schedule/class-permission/rules">系统规则</a>
+ </div>
+ <p id="classQuietStatus" class="preference-note" role="status"></p>
+</section><section class="card settings-group schedule-routine morning-routine" aria-labelledby="morningRoutineTitle">
+      <h2 id="morningRoutineTitle">早检</h2>
+      <div class="settings-row"><span><b>显示早检教室</b><small><span id="morningTimeSummary">同步开启早检提醒 · 07:25–07:30</span></small></span><label class="switch"><input type="checkbox" id="swMorning" aria-label="显示早检教室与提醒"><span class="slider"></span></label></div>
+      <div class="morning-days-setting"><b>早检星期</b><div id="morningDays" role="group" aria-label="选择需要早检的星期"><button type="button" data-morning-day="0" aria-pressed="false">一</button><button type="button" data-morning-day="1" aria-pressed="false">二</button><button type="button" data-morning-day="2" aria-pressed="false">三</button><button type="button" data-morning-day="3" aria-pressed="false">四</button><button type="button" data-morning-day="4" aria-pressed="false">五</button><button type="button" data-morning-day="5" aria-pressed="false">六</button><button type="button" data-morning-day="6" aria-pressed="false">日</button></div><p id="morningDaysHint" class="preference-note"></p></div>
+<form id="morningTimeForm" class="morning-time-setting"><div class="calendar-time-fields"><label>早检开始<input id="morningStart" type="text" inputmode="none" autocomplete="off" data-time-wheel="morning-start" data-time-label="早检开始时间" aria-haspopup="dialog" value="07:25" readonly></label><label>早检结束<input id="morningEnd" type="text" inputmode="none" autocomplete="off" data-time-wheel="morning-end" data-time-label="早检结束时间" aria-haspopup="dialog" value="07:30" readonly></label></div><div class="morning-time-actions"><small id="morningTimeStatus" role="status">提醒按已保存时间显示</small><button type="submit" class="small-btn" id="morningTimeSave">保存时间</button></div></form>
+<button type="button" id="setMorningRoom" class="settings-row settings-link"><span><b>早检教室</b><small>开启后显示在课表左上角与早检提醒中</small></span><span class="settings-trailing"><span id="setMorningValue">未设置</span><span aria-hidden="true">›</span></span></button>
+    </section><section class="card settings-group schedule-routine night-routine" aria-labelledby="nightRoutineTitle">
+      <h2 id="nightRoutineTitle">晚自习</h2>
+      <div class="settings-row"><span><b>显示晚自习</b><small>在课表中显示默认晚自习安排</small></span><label class="switch"><input type="checkbox" id="swNight" aria-label="显示晚自习"><span class="slider"></span></label></div>
+      <div class="morning-days-setting night-days-setting"><b>晚自习星期</b><div id="nightDays" role="group" aria-label="选择需要晚自习的星期"><button type="button" data-night-day="0" aria-pressed="false">一</button><button type="button" data-night-day="1" aria-pressed="false">二</button><button type="button" data-night-day="2" aria-pressed="false">三</button><button type="button" data-night-day="3" aria-pressed="false">四</button><button type="button" data-night-day="4" aria-pressed="false">五</button><button type="button" data-night-day="5" aria-pressed="false">六</button><button type="button" data-night-day="6" aria-pressed="false">日</button></div><p id="nightDaysHint" class="preference-note"></p></div>
+      <div class="settings-room" id="roomCard"><label for="nightRoom">晚自习教室</label><div class="settings-input-row"><input id="nightRoom" class="elec-input" maxlength="30" placeholder="例如：E-201"><button id="nightRoomSave" class="elec-btn" type="button">保存</button></div></div>
+    </section>
+</div></div>
+
+<div id="classAliases" class="hidden settings-subpage">
+ <div class="topbar"><button id="classAliasesBack" type="button">‹ 课表设置</button><div class="t">课程别名</div><span class="settings-header-space" aria-hidden="true"></span></div>
+ <div class="elec-body settings-body">
+  <p class="preference-note class-alias-intro">简称用于课程上岛。点击课程即可编辑。</p>
+  <section id="classAliasList" class="card settings-group class-alias-list" aria-label="课程列表"></section>
+  <p id="classAliasStatus" class="preference-note class-alias-intro" role="status"></p>
+ </div>
+</div>
+<div id="classAliasEditor" class="hidden settings-subpage">
+ <div class="topbar"><button id="classAliasEditorBack" type="button">‹ 课程别名</button><div class="t">编辑别名</div><span class="settings-header-space" aria-hidden="true"></span></div>
+ <div class="elec-body settings-body">
+  <form id="classAliasForm" class="card settings-group class-alias-form">
+   <div class="class-alias-heading"><small>课程全名</small><h2 id="classAliasTitle"></h2></div>
+   <div class="class-alias-preview"><span>自动简称</span><b id="classAliasAuto">正在读取…</b></div>
+   <label for="classAliasName">自定义别名</label>
+   <input id="classAliasName" class="elec-input" placeholder="留空使用自动简称" maxlength="24" autocomplete="off">
+   <button id="classAliasSave" class="elec-btn" type="submit">保存别名</button>
+  </form>
+ </div>
+</div>
+
+<div class="main-tabbar hidden" id="mainTabbar">
+  <button class="main-tab active" data-tab="today"><span class="ic" data-icon="home" aria-hidden="true"></span>今日</button>
+  <button class="main-tab" data-tab="schedule"><span class="ic" data-icon="calendar" aria-hidden="true"></span>课表</button>
+  <button class="main-tab" data-tab="chaoxing"><span class="ic" data-icon="book" aria-hidden="true"></span>学习通</button>
+  <button class="main-tab" data-tab="waterDevice"><span class="ic" data-icon="drop" aria-hidden="true"></span>接水</button>
+  <button class="main-tab" data-tab="settings"><span class="ic" data-icon="user" aria-hidden="true"></span>我的</button>
+</div>
+
+<div id="notices" class="hidden"><div class="topbar"><button id="noticesBack" type="button">‹ 我的</button><div class="t">开源声明与致谢</div><span class="settings-header-space" aria-hidden="true"></span></div><div class="elec-body notices-body" id="noticesContent"><h1>开源声明与致谢</h1><p>感谢开源社区的贡献。第三方项目的版权及许可归各权利人所有。</p><h2>使用的开源组件</h2><div class="notice-projects"><article class="notice-project"><h3>zxing-wasm 3.1.7</h3><p>Ze-Zheng Wu · MIT</p><p>本地二维码识别；不上传相册图片或摄像头画面</p><a href="https://github.com/Sec-ant/zxing-wasm">github.com/Sec-ant/zxing-wasm</a><a class="notice-license-link" href="https://opensource.org/license/mit">查看许可 ↗</a></article><article class="notice-project"><h3>ZXing-C++ / ZXingWasm C++</h3><p>ZXing authors / Sec-ant · Apache-2.0</p><p>本地二维码识别；不上传相册图片或摄像头画面</p><a href="https://github.com/zxing-cpp/zxing-cpp">github.com/zxing-cpp/zxing-cpp</a><a class="notice-license-link" href="https://www.apache.org/licenses/LICENSE-2.0">查看许可 ↗</a></article><article class="notice-project"><h3>zint（解码器发行包附带声明）</h3><p>Zint authors · BSD-3-Clause</p><p>本地二维码识别；不上传相册图片或摄像头画面</p><a href="https://github.com/zint/zint">github.com/zint/zint</a><a class="notice-license-link" href="https://opensource.org/license/bsd-3-clause">查看许可 ↗</a></article><article class="notice-project"><h3>jsoup 1.23.2</h3><p>Jonathan Hedley · MIT</p><p>解析学校与学习通网页</p><a href="https://github.com/jhy/jsoup">github.com/jhy/jsoup</a><a class="notice-license-link" href="https://opensource.org/license/mit">查看许可 ↗</a></article><article class="notice-project"><h3>jsQR 1.4.0</h3><p>Cozmo / jsQR contributors · Apache-2.0</p><p>本机摄像头、相册二维码识别</p><a href="https://github.com/cozmo/jsQR">github.com/cozmo/jsQR</a><a class="notice-license-link" href="https://www.apache.org/licenses/LICENSE-2.0">查看许可 ↗</a></article></div><h2>当前功能与交互参考</h2><article class="notice-project"><h3>Sleepy 课程表</h3><p>lingion · GPL-3.0</p><p>单次课程、调休、课表导出、上课设置和玻璃外观参考；本版独立实现，未复制或打包其源码</p><a href="https://github.com/lingion/sleepy">github.com/lingion/sleepy</a><a href="https://github.com/lingion/sleepy/blob/main/LICENSE">项目许可 ↗</a></article><p>以下项目用于公开协议、功能或设计思路参考，未引入其运行库或复制项目代码。life-798 登录适配亦感谢 YechoY 在 issue #32 的协议说明。</p><div class="notice-projects"><article class="notice-project"><h3>life-798</h3><p>nocookies111 · MIT</p><p>798 登录、接水与账单接口参考</p><a href="https://github.com/nocookies111/life-798">github.com/nocookies111/life-798</a><a class="notice-license-link" href="https://opensource.org/license/mit">查看许可 ↗</a></article><article class="notice-project"><h3>ocsjs</h3><p>ocsjs · MIT</p><p>学习通题型和表单字段参考</p><a href="https://github.com/ocsjs/ocsjs">github.com/ocsjs/ocsjs</a><a class="notice-license-link" href="https://opensource.org/license/mit">查看许可 ↗</a></article><article class="notice-project"><h3>yatori-go-core</h3><p>yatori-dev · MIT</p><p>学习通作业题型识别参考</p><a href="https://github.com/yatori-dev/yatori-go-core">github.com/yatori-dev/yatori-go-core</a><a class="notice-license-link" href="https://opensource.org/license/mit">查看许可 ↗</a></article><article class="notice-project"><h3>obsidian-chaoxing</h3><p>YukiHimeno · 未明确声明</p><p>学习通页面和提交字段参考</p><a href="https://github.com/YukiHimeno/obsidian-chaoxing">github.com/YukiHimeno/obsidian-chaoxing</a></article><article class="notice-project"><h3>onetake</h3><p>feitangyuan · PolyForm Noncommercial 1.0.0</p><p>界面与交互设计参考；未引入项目运行库</p><a href="https://github.com/feitangyuan/onetake">github.com/feitangyuan/onetake</a><a class="notice-license-link" href="https://github.com/feitangyuan/onetake/blob/main/LICENSE">查看许可 ↗</a></article><article class="notice-project"><h3>liquid-glass-react</h3><p>rdev · MIT</p><p>界面与交互设计参考；未引入项目运行库</p><a href="https://github.com/rdev/liquid-glass-react">github.com/rdev/liquid-glass-react</a><a class="notice-license-link" href="https://github.com/rdev/liquid-glass-react/blob/master/LICENSE">查看许可 ↗</a></article><article class="notice-project"><h3>liquid-glass</h3><p>shuding · MIT</p><p>界面与交互设计参考；未引入项目运行库</p><a href="https://github.com/shuding/liquid-glass">github.com/shuding/liquid-glass</a><a class="notice-license-link" href="https://github.com/shuding/liquid-glass/blob/main/LICENSE">查看许可 ↗</a></article><article class="notice-project"><h3>AndroidLiquidGlass</h3><p>Kyant0 · Apache-2.0</p><p>界面与交互设计参考；未引入项目运行库</p><a href="https://github.com/Kyant0/AndroidLiquidGlass">github.com/Kyant0/AndroidLiquidGlass</a><a class="notice-license-link" href="https://github.com/Kyant0/AndroidLiquidGlass/blob/kmp/LICENSE">查看许可 ↗</a></article></div><h2>随包许可文本</h2><p>许可链接便于查看原文；随包分发的组件版权与许可同时保留在本机，离线也可阅读。</p><details class="notice-license"><summary>zint-LICENSE.txt · 展开许可全文</summary><pre>
+</pre></details><details class="notice-license"><summary>zxing-cpp-LICENSE.txt · 展开许可全文</summary><pre>                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      &quot;License&quot; shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      &quot;Licensor&quot; shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      &quot;Legal Entity&quot; shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      &quot;control&quot; means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      &quot;You&quot; (or &quot;Your&quot;) shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      &quot;Source&quot; form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      &quot;Object&quot; form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      &quot;Work&quot; shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      &quot;Derivative Works&quot; shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      &quot;Contribution&quot; shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, &quot;submitted&quot;
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as &quot;Not a Contribution.&quot;
+
+      &quot;Contributor&quot; shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a &quot;NOTICE&quot; text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an &quot;AS IS&quot; BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets &quot;{}&quot;
+      replaced with your own identifying information. (Don&#x27;t include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same &quot;printed page&quot; as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright {yyyy} {name of copyright owner}
+
+   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+</pre></details><details class="notice-license"><summary>zxing-wasm-cpp-LICENSE.txt · 展开许可全文</summary><pre>                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      &quot;License&quot; shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      &quot;Licensor&quot; shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      &quot;Legal Entity&quot; shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      &quot;control&quot; means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      &quot;You&quot; (or &quot;Your&quot;) shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      &quot;Source&quot; form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      &quot;Object&quot; form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      &quot;Work&quot; shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      &quot;Derivative Works&quot; shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      &quot;Contribution&quot; shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, &quot;submitted&quot;
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as &quot;Not a Contribution.&quot;
+
+      &quot;Contributor&quot; shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a &quot;NOTICE&quot; text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an &quot;AS IS&quot; BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets &quot;[]&quot;
+      replaced with your own identifying information. (Don&#x27;t include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same &quot;printed page&quot; as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright 2016 Nu-book Inc.
+   Copyright 2023 Axel Waggershauser
+   Copyright 2023 Ze-Zheng Wu
+
+   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+</pre></details><details class="notice-license"><summary>zxing-wasm-LICENSE.txt · 展开许可全文</summary><pre>MIT License
+
+Copyright (c) 2023 Ze-Zheng Wu
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the &quot;Software&quot;), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+</pre></details><details class="notice-license"><summary>jsoup · MIT · 展开许可全文</summary><pre>The MIT License
+
+Copyright (c) 2009-2026 Jonathan Hedley &lt;https://jsoup.org/&gt;
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the &quot;Software&quot;), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+</pre></details><details class="notice-license"><summary>jsQR · Apache-2.0 · 展开许可全文</summary><pre>                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      &quot;License&quot; shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      &quot;Licensor&quot; shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      &quot;Legal Entity&quot; shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      &quot;control&quot; means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      &quot;You&quot; (or &quot;Your&quot;) shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      &quot;Source&quot; form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      &quot;Object&quot; form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      &quot;Work&quot; shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      &quot;Derivative Works&quot; shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      &quot;Contribution&quot; shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, &quot;submitted&quot;
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as &quot;Not a Contribution.&quot;
+
+      &quot;Contributor&quot; shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a &quot;NOTICE&quot; text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an &quot;AS IS&quot; BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets &quot;{}&quot;
+      replaced with your own identifying information. (Don&#x27;t include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same &quot;printed page&quot; as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright {yyyy} {name of copyright owner}
+
+   Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+</pre></details><details class="notice-license"><summary>life-798 · MIT · 展开许可全文</summary><pre>MIT License
+
+Copyright (c) 2026 nocookies111
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the &quot;Software&quot;), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+</pre></details><details class="notice-license"><summary>liquid-glass-react · MIT · 展开许可全文</summary><pre>Copyright 2025 MAX ROVENSKY
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+</pre></details><p>系统字体和 Android WebView 由设备提供。禾序的校园课表、交互及数据适配独立实现。</p></div></div>
+<div id="diag" class="hidden">
+  <div class="topbar">
+    <button id="diagBack">‹ 返回</button>
+    <div class="t">自检诊断</div>
+    <button id="diagRun">重跑</button>
+  </div>
+  <div class="elec-body">
+    <div class="card">
+      <div class="lbl" id="diagVer">—</div>
+      <div id="diagList"><div class="lbl">点右上角「重跑」开始检查</div></div>
+    </div>
+    <div class="card">
+      <div class="lbl" style="line-height:1.9">
+        诊断说明：<br>
+        · <b>封面</b>一行会同时检查「接口是否给图」和「图片代理是否通」<br>
+        · 若接口给了图但代理失败，通常是网络问题<br>
+        · 若接口没给图，是图书馆本身没有这本书的封面
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="morningRoomDialog" class="modal room-dialog hidden" role="dialog" aria-modal="true" aria-labelledby="morningRoomTitle" aria-describedby="morningRoomHint">
+  <form class="modal-box" id="morningRoomForm">
+    <div class="h" id="morningRoomTitle">早检教室</div>
+    <p id="morningRoomHint">开启“显示早检教室”后，教室会显示在课表左上角与早检提醒中，所有周次通用。</p>
+    <label for="morningRoomInput">教室</label><input id="morningRoomInput" maxlength="30" placeholder="例如：E-201" autocomplete="off" enterkeyhint="done">
+    <div class="modal-btns"><button type="button" class="cancel" id="morningRoomCancel">取消</button><button type="submit" class="ok">保存</button></div>
+    <button type="button" class="room-clear" id="morningRoomClear">清除教室</button>
+  </form>
+</div>
+
+<div id="modal" class="modal calendar-modal hidden" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+ <form id="calendarForm" class="modal-box calendar-editor">
+  <header class="calendar-carry"><div><h2 id="mTitle">新日程</h2><p id="mRange"></p></div><button type="button" id="mCancel" aria-label="关闭日程编辑">×</button></header>
+  <div class="calendar-fields"><label for="mName">日程名称</label><input id="mName" maxlength="40" required placeholder="自习、运动，或任何想做的事" autocomplete="off">
+  <label for="mRoom">地点或备注</label><input id="mRoom" maxlength="80" placeholder="选填" autocomplete="off">
+  <label for="mDay">星期</label><select id="mDay"></select>
+  <details class="calendar-weeks"><summary>生效周次 <span id="mWeeksSummary">全部周次</span></summary><div class="calendar-week-actions"><button type="button" id="mWeeksAll">全选</button><button type="button" id="mWeeksCurrent">仅当前周</button><button type="button" id="mWeeksOdd">单周</button><button type="button" id="mWeeksEven">双周</button></div><div id="mWeeks" role="group" aria-label="选择日程生效周次"></div></details>
+  <div class="calendar-time-fields"><label>开始<input id="mStart" type="text" inputmode="none" aria-haspopup="dialog" autocomplete="off" data-time-wheel="start" required></label><label>结束<input id="mFinish" type="text" inputmode="none" aria-haspopup="dialog" autocomplete="off" data-time-wheel="end" required></label></div>
+  <p id="mDuration" class="preference-note"></p><p id="mError" class="err" role="status"></p>
+  <button id="mSingleEdit" type="button" class="plan-single-link">仅调整当前查看周的这一次 ›</button><div class="calendar-actions"><button type="button" id="mDel" class="hidden">删除日程</button><button type="submit" id="mOk">保存日程</button></div><small class="calendar-help">拖动上下边缘，每 5 分钟吸附；日程至少 15 分钟，点击日程即可编辑。</small></div>
+ </form>
+</div>
+
+<div id="planDialog" class="wheel-modal hidden" role="dialog" aria-modal="true" aria-label="课表工具">
+ <section class="wheel-box plan-box">
+  <div class="wheel-head"><div><span class="water-entry-caption">把安排理顺，把课表带走</span><h3>课表工具</h3></div><button type="button" data-plan-close>关闭</button></div>
+  <section class="plan-widget-entry">
+   <b>添加桌面组件</b>
+   <div class="plan-widget-actions"><a href="jxau-pocket://schedule/widget"><span aria-hidden="true">▤</span> 今日安排</a><a href="jxau-pocket://schedule/next-widget"><span aria-hidden="true">◷</span> 下一项安排</a></div>
+   <p class="plan-widget-hint">点击后按系统提示添加。若未弹窗，长按桌面空白处，在「小组件」里找到「禾序」。</p>
+  </section>
+  <div class="plan-tabs" role="tablist" aria-label="课表工具"><span class="plan-tab-indicator" aria-hidden="true"></span><button id="planTabTransfer" type="button" role="tab" aria-controls="planTransferView" data-plan-tab="transfer">调课补课</button><button id="planTabExport" type="button" role="tab" aria-controls="planExportView" data-plan-tab="export">分享导出</button><button id="planTabChanges" type="button" role="tab" aria-controls="planChangesView" data-plan-tab="changes">修改记录</button></div>
+  <div class="plan-tab-stage">
+   <div id="planTransferView" class="plan-tool-view" role="tabpanel" aria-labelledby="planTabTransfer">
+    <fieldset class="plan-mode">
+     <legend>调整方式</legend>
+     <div class="plan-mode-options">
+      <label><input type="radio" name="planTransferMode" value="replace" checked><span><b>调休</b><small>把课程移到另一天</small></span></label>
+      <label><input type="radio" name="planTransferMode" value="append"><span><b>补课</b><small>原课照常，另加一次</small></span></label>
+     </div>
+    </fieldset>
+    <div class="plan-date-pair"><label>哪天的课<input id="planSource" type="date" required></label><label><span id="planTargetLabel">调到哪天</span><input id="planTarget" type="date" required></label></div>
+    <div id="planTransferPreview" class="plan-preview" role="status"></div>
+    <button id="planTransferSave" class="plan-primary" type="button">确认这次调整</button>
+   </div>
+   <div id="planExportView" class="plan-tool-view hidden" role="tabpanel" aria-labelledby="planTabExport">
+    <p class="plan-intro">图片可不选择文件夹直接保存（Android 10 及以上）。</p>
+    <div class="plan-export-actions"><button id="planExportImage" class="plan-export-option" type="button"><span aria-hidden="true">▧</span><b>课表图片</b><small>当前查看周 · PNG</small></button><button id="planExportIcs" class="plan-export-option" type="button"><span aria-hidden="true">▦</span><b>日历文件</b><small>导入系统日历 · ICS</small></button></div>
+    <div class="plan-export-range"><label for="planExportRange">日历范围</label><select id="planExportRange"><option value="week">当前查看周</option><option value="term">本学期</option></select></div>
+    <p id="planExportStatus" class="plan-field-hint" role="status"></p>
+    <div class="plan-save-actions"><a id="planSaveImage" class="plan-primary hidden" href="#">保存到相册</a><a id="planSaveFile" class="plan-primary hidden" href="#">选择保存位置</a></div>
+    <img id="planImagePreview" class="hidden" alt="待导出的课表图片">
+    <p class="plan-field-hint">学校尚未缓存的课程不会包含在文件中。</p>
+   </div>
+   <div id="planChangesView" class="plan-tool-view hidden" role="tabpanel" aria-labelledby="planTabChanges">
+    <div class="plan-record-heading"><div><b>最近操作</b><small>最多保留20步，本次打开应用期间有效</small></div><div class="plan-history"><button id="planUndo" type="button" disabled>↶ 撤回</button><button id="planRedo" type="button" disabled>↷ 重做</button></div></div>
+    <p id="planEditHint" class="plan-field-hint"></p>
+    <div id="planChangesList"></div>
+    <details class="plan-record-note"><summary>学校课表更新后会怎样？</summary><p>如果原课程已变化，会保留修改记录并采用学校新数据。恢复这条记录后，可以重新调整。</p></details>
+   </div>
+  </div>
+  <p id="planError" class="err" role="status"></p>
+ </section>
+</div>
+<div id="planOccurrenceDialog" class="wheel-modal hidden" role="dialog" aria-modal="true" aria-labelledby="planOccurrenceTitle"><form id="planOccurrenceForm" class="wheel-box plan-box"><div class="wheel-head"><div><span class="water-entry-caption">仅修改本次 · 其他周次不变</span><h3 id="planOccurrenceTitle">调整这一次</h3></div><button type="button" data-plan-occurrence-close>关闭</button></div><label class="plan-label" for="planOccurrenceName">名称</label><input id="planOccurrenceName" maxlength="40" required><label class="plan-label" for="planOccurrenceRoom">地点或备注</label><input id="planOccurrenceRoom" maxlength="80"><label class="plan-label" for="planOccurrenceDate">本次日期</label><input id="planOccurrenceDate" type="date" required><div class="calendar-time-fields"><label>开始<input id="planOccurrenceStart" type="text" readonly data-time-wheel="start" data-time-label="本次开始时间"></label><label>结束<input id="planOccurrenceEnd" type="text" readonly data-time-wheel="end" data-time-label="本次结束时间"></label></div><p id="planOccurrenceError" class="err" role="status"></p><button class="elec-btn" type="submit">保存本次调整</button></form></div>
+<script src="js/icons.js"></script>
+<script src="js/confirm.js"></script>
+<script src="js/surface-motion.js"></script>
+<script src="js/overlay-scroll.js"></script>
+<script src="js/schedule-core.js"></script>
+<script src="js/app.js"></script>
+<script src="js/homework.js"></script>
+<script src="js/water-spending.js"></script>
+<script src="js/integrations.js"></script>
+<script src="js/parcels.js"></script>
+<script src="js/date-range.js"></script>
+<script src="js/avatar.js"></script>
+<script src="js/appearance.js"></script>
+<script src="js/dock-lens.js"></script>
+<script src="js/support.js"></script>
+<script src="js/route-motion.js"></script>
+<script src="js/calendar.js"></script>
+<script src="js/planner.js"></script>
+<script src="js/class-mode.js"></script>
+<script src="js/glass-optics.js"></script>
+<script src="js/water-tools.js"></script>
+</body>
+</html>

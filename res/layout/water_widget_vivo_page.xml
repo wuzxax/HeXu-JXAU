@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:id="@+id/widget_card" android:alpha="1" android:visibility="visible" android:orientation="vertical" android:padding="10dp" android:background="@drawable/widget_background">
+ <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center_vertical">
+  <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="●  禾序" android:textSize="10sp" android:textColor="#8dbba5" />
+  <TextView android:id="@+id/widget_state" android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:gravity="right" android:text="已就绪" android:textSize="10sp" android:textColor="#b6d5bc" />
+  <TextView android:id="@+id/widget_config" android:layout_width="32dp" android:layout_height="28dp" android:gravity="right|center_vertical" android:text="···" android:contentDescription="选择接水设备" android:textSize="21sp" android:textColor="#d2e6d7" />
+ </LinearLayout>
+ <TextView android:id="@+id/widget_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="桌面接水" android:textColor="#ffffff" android:textSize="19sp" android:textStyle="bold" android:maxLines="1" android:ellipsize="end" />
+ <TextView android:id="@+id/widget_status" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:gravity="center_vertical" android:text="轻点开启 · 无需打开禾序" android:textColor="#a9c9b7" android:textSize="11sp" android:maxLines="2" android:ellipsize="end" />
+ <TextView android:id="@+id/widget_device_number" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="9sp" android:textColor="#8dbba5" android:maxLines="1" android:ellipsize="end" android:layout_marginBottom="4dp" />
+ <TextView android:id="@+id/widget_start" android:layout_width="match_parent" android:layout_height="36dp" android:gravity="center" android:text="开始接水" android:textStyle="bold" android:textSize="13sp" android:textColor="#183d2e" android:background="@drawable/widget_action_start" />
+ <LinearLayout android:layout_width="match_parent" android:layout_height="22dp" android:gravity="center_vertical">
+  <TextView android:id="@+id/widget_pages" android:layout_width="0dp" android:layout_weight="1" android:layout_height="match_parent" android:gravity="center" android:text="●" android:textSize="9sp" android:textColor="#a9c9b7" />
+ </LinearLayout>
+</LinearLayout>

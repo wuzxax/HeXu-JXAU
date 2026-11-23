@@ -1,0 +1,166 @@
+/* Layout aligned with the approved 小站UI方向对比 interactive proposal. */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+html .home-services-card{padding:0;margin:21px 0 18px;border:0;border-radius:0;background:none;box-shadow:none}
+.home-services-card .section-heading{margin:0 0 11px}
+.home-service-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.home-service-item{background:#fff;border:1px solid #e5ece550;border-radius:15px;min-height:72px;padding:12px 3px 10px;gap:7px;font-size:11px;box-shadow:0 1px 0 #203b2910;color:#263e2c}
+.home-service-item .home-service-icon{background:none;width:23px;height:23px;border-radius:0;display:grid;place-items:center;color:var(--green)}
+.home-service-icon svg{width:22px;height:22px;stroke-width:1.7}
+html[data-style=reading] .home-services-card{padding:0;margin:19px 0 17px;border:0}
+html[data-style=reading] .home-service-grid{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:7px 0;gap:0}
+html[data-style=reading] .home-service-item{border:0;border-radius:0;background:none;box-shadow:none;min-height:62px}
+html[data-style=reading] .home-service-item+.home-service-item{border-left:1px solid var(--line)}
+html[data-style=soft] .home-service-item{border-radius:20px;background:#e4ecdd;border-color:transparent;box-shadow:none}
+html[data-style=soft] .home-service-item .home-service-icon{background:none;border-radius:0}
+.today-courses{padding:13px 13px 8px;border-radius:21px}
+.today-courses .section-heading{margin-bottom:3px}.today-courses .section-heading h2{font-size:14px}
+.tday-row{border:0;padding:11px 2px;gap:9px;align-items:center}
+.tday-row .tm{flex:0 0 34px;font-size:10px;line-height:1.8}
+.tday-row .bd{border-left:2px solid #c7ceca;padding-left:9px}
+.tday-row .bd .n{font-size:13px;line-height:1.5;overflow-wrap:anywhere}
+.tday-row .bd .r{font-size:10px;line-height:1.6;margin-top:3px}
+.tday-row.next,.tday-row.cur{margin:4px -6px;padding:13px 9px;border-radius:14px}
+.tday-row.next .bd,.tday-row.cur .bd{border-left:1px solid #ffffff40}
+.course-upcoming{display:block;font-size:9px;font-weight:400;margin-bottom:3px;color:#d0e0ce}
+.course-countdown{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-end;gap:2px;margin:0;font-size:9px;white-space:nowrap;max-width:42%}
+.course-countdown b{font-size:27px;font-weight:600;line-height:1.2;letter-spacing:-1px}
+.course-countdown small{font-size:9px;font-weight:400}.countdown-caption{font-size:9px}
+.tday-row>.ended-tag{margin:0;font-size:9px;font-weight:400;background:#edf0ed;padding:4px 5px;border-radius:6px;white-space:nowrap}
+.today-course-actions{padding:3px 0 0}.today-course-actions .text-button{font-size:10px;min-height:30px}
+html[data-style=reading] .course-upcoming,html[data-style=soft] .course-upcoming{color:#67805c}
+html[data-style=reading] .tday-row.next .bd,html[data-style=reading] .tday-row.cur .bd,html[data-style=soft] .tday-row.next .bd,html[data-style=soft] .tday-row.cur .bd{border-color:#aac29b}
+.calendar-event{background:#d8e9cf;border-color:#bfd1b3;border-radius:8px;color:#466b35;box-shadow:inset 2px 0 #83a76e;align-items:flex-start}
+.calendar-event-label{padding:10px 4px 7px;text-align:left}
+.calendar-event strong{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:10px;line-height:1.5}
+.calendar-event small{color:#67825b;font-size:8px;line-height:1.6}.calendar-event-time{margin:3px 0 0;letter-spacing:-.3px}
+.calendar-event-label .calendar-event-room{display:none}.calendar-edge:after{background:#7d9e6a;width:17px;left:calc(50% - 8.5px)}
+.calendar-edge{height:18px}.calendar-edge.start{top:-12px}.calendar-edge.end{bottom:-12px}.calendar-edge:after{top:8px}
+.calendar-event.is-short .calendar-event-label{padding:5px 3px 2px}
+.calendar-event.resizing{outline-color:#749c62;box-shadow:0 5px 14px #4d733522}
+.calendar-modal .calendar-editor{background:#fff;border-radius:22px;padding:16px;border-color:#dce5d7;box-shadow:0 8px 24px #19372417}
+.calendar-carry{background:none;padding:0 0 5px;border-radius:0;min-height:48px}.calendar-carry h2{font-size:19px;line-height:1.5}.calendar-carry p{margin-top:3px}
+.calendar-carry button{background:#f0f4ed;width:30px;height:30px;min-width:30px;font-size:21px}
+.calendar-fields{padding:0}.calendar-fields>label{margin:10px 0 4px;font-size:10px}
+.calendar-fields>input,.calendar-fields>select,.calendar-time-fields input{border-radius:8px;background:#f8faf6;font-size:12px;border-color:#d8e1d2;min-height:42px;padding:9px}
+.calendar-time-fields{gap:9px;margin-top:11px}.calendar-time-fields label{font-size:10px}.calendar-time-fields input{margin-top:5px}
+.calendar-fields .preference-note{font-size:10px;margin:10px 0 0}.calendar-fields .err{font-size:11px;min-height:18px;margin:5px 0}
+.calendar-actions button{font-size:12px;border-radius:10px}.calendar-actions #mDel{background:#f7ede8;padding-left:12px}.calendar-help{font-size:10px;margin-top:10px}
+.calendar-morph{background:#f8faf6;border-radius:8px;box-shadow:0 8px 16px #19372417}
+#schedule td.c{border-radius:7px;box-shadow:inset 2px 0 #99b29b}#schedule td.empty{border:0;border-top:1px solid #e7ece6;border-radius:0;background:transparent}#schedule td.empty:hover{background:#e1ecd9}
+html #waterDevice .water-devices-card,html #waterDevice .water-stats-card{background:none;border:0;box-shadow:none;padding:0;margin:20px 0}
+#waterDevice .water-device-row,#waterDevice .water-device-row:last-child{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin:9px 0;min-height:66px}
+#waterDevice .water-spend-group{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+#waterDevice .water-spend-group.bath{background:var(--card);margin-top:10px}
+#waterDevice .water-spend-grid strong{font-size:21px;font-weight:600}.water-spend-heading{margin-bottom:10px}
+#waterDevice .water-volume{margin:0;padding:8px 14px 3px;font-size:10px}
+#waterDevice .water-balance-card{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:12px;padding:15px 16px}
+.water-balance-card .section-heading{grid-column:1;display:block;margin:0}.water-balance-card .section-heading h2{font-size:11px}.water-balance-card .section-heading .lbl{display:block;font-size:9px;margin-top:5px}
+#waterDevice .water-balance{grid-column:2;grid-row:1 / span 2;margin:0;align-self:center;font-size:25px;line-height:1.4}.water-balance-card #waterWalletName{font-size:10px;margin-top:4px}
+.water-balance-card>.text-button{grid-column:1 / -1;font-size:10px;margin-top:10px;padding:9px 0 0}
+html[data-style=reading] #waterDevice .water-spend-group,html[data-style=reading] #waterDevice .water-device-row{border-radius:8px;background:transparent}
+html[data-style=soft] #waterDevice .water-spend-group,html[data-style=soft] #waterDevice .water-device-row{border-radius:21px}
+@media(max-width:350px){.course-countdown b{font-size:24px}.tday-row .bd .n{font-size:12px}.home-service-item{font-size:10px}.today-courses{padding:12px}.calendar-modal .calendar-editor{padding:14px}}
+
+/* Keep locations and notes visible in timetable blocks. */
+.calendar-event-label .calendar-event-room{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:3px;color:#526e48;font-size:9px}
+.calendar-event-label{padding:8px 4px 5px}.calendar-event.is-short .calendar-event-label{padding:4px 3px 2px}
+.calendar-event.is-short .calendar-event-label .calendar-event-room{display:block;font-size:8px;margin-top:1px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+.home-water-choice select{font:inherit;font-size:10px;color:var(--green);border:1px solid var(--line);background:var(--bg);border-radius:8px;min-height:30px;max-width:105px;padding:4px 6px}
+#waterDevice .water-balance-card{display:block;padding:0;overflow:hidden}
+.balance-fold{display:flex;width:100%;justify-content:space-between;align-items:center;gap:10px;padding:13px 16px;border:0;background:none;color:var(--green);font-size:12px;font-weight:500;min-height:44px}
+.fold-caption{font-size:10px;font-weight:400;color:var(--muted)}
+#waterBalanceBody{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:0 10px;padding:0 16px 14px}
+#waterBalanceBody .section-heading{grid-column:1;margin:0}#waterBalanceBody .water-balance{grid-column:2;grid-row:1 / span 2}#waterWalletName{grid-column:1}#waterBalanceBody .text-button{grid-column:1 / -1;margin-top:10px;border-top:1px solid var(--line);padding:10px 0 0;text-align:left;font-size:10px}
+#waterDevice .water-balance-card.folded{display:flex;align-items:center}.water-balance-card.folded .balance-fold{flex:1;width:auto}#waterAccountFolded{font-size:10px;min-height:44px;white-space:nowrap;padding:5px 15px}
+.water-widget-link{display:inline-block;font-size:11px;color:var(--green);padding:6px 2px;text-decoration:none}
+.water-device-heading{flex-wrap:wrap;gap:10px}.water-device-heading .text-button{font-size:11px;min-height:36px}
+.wheel-modal{position:fixed;inset:0;z-index:85;display:flex;align-items:flex-end;background:#1e372b50;padding:14px 14px calc(20px + env(safe-area-inset-bottom,0px))}
+.wheel-box{width:100%;max-width:430px;margin:0 auto;background:#fff;border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:0 8px 24px #19372417}
+.wheel-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.wheel-head h3{font-size:17px;margin:0}.wheel-head button{border:0;background:none;color:var(--green);font:inherit;font-size:13px;min-height:40px;padding:5px 10px}
+.time-wheels{position:relative;display:flex;justify-content:center;align-items:center;height:196px;margin:10px 0;gap:12px;isolation:isolate}
+.time-wheels:before{content:'';position:absolute;z-index:-1;left:12px;right:12px;top:77px;height:42px;background:var(--soft);border-radius:12px;border:1px solid var(--line)}
+.time-wheel{height:196px;overflow-y:auto;overscroll-behavior:contain;scroll-snap-type:y mandatory;scrollbar-width:none;width:90px;padding:77px 0;box-sizing:border-box;mask-image:linear-gradient(transparent,#000 30%,#000 70%,transparent)}
+.time-wheel::-webkit-scrollbar{display:none}.time-wheel button{display:block;width:100%;height:42px;min-height:42px;scroll-snap-align:center;border:0;background:none;color:#78906e;font-size:22px;font-variant-numeric:tabular-nums;padding:0}
+.time-wheel button[aria-selected=true]{color:var(--green);font-weight:650}.wheel-hint{font-size:10px;color:var(--muted);text-align:center;line-height:1.8;margin:8px 0 0}
+.scan-video{width:100%;max-height:45vh;object-fit:cover;background:#13251b;border-radius:14px;margin-top:10px;display:block}.scan-status{font-size:12px;line-height:1.8;color:var(--muted);margin:12px 0}.scan-actions{display:flex;gap:10px}.scan-actions button{border:1px solid var(--line);background:#edf4e8;border-radius:10px;min-height:42px;padding:8px 12px;color:var(--green);font-size:12px}
+
+.calendar-event.is-short .calendar-event-label{padding:1px 3px}.calendar-event.is-short strong{font-size:9px;line-height:1.15;-webkit-line-clamp:1}.calendar-event.is-short .calendar-event-label .calendar-event-room{font-size:8px;line-height:1.15}
+.calendar-edge{height:14px}.calendar-edge.start{top:-14px}.calendar-edge.end{bottom:-14px}.calendar-edge:after{top:6px}
+#waterBalanceBody.hidden{display:none!important}
+#waterDevice .water-balance-card.folded .balance-fold{display:flex;flex:1 1 auto;min-width:0;white-space:nowrap;width:auto}
+#waterDevice .water-balance-card.folded #waterAccountFolded{flex:none;width:auto;margin:0;border:0;padding:5px 15px}
+.balance-fold>span{white-space:nowrap}
+.calendar-event.is-short .calendar-event-label .calendar-event-room{display:-webkit-box;white-space:normal;-webkit-line-clamp:2;overflow-wrap:anywhere}
+
+/* Course sheet: same continuous bottom reveal as the approved proposal. */
+#detail.detail,#detail.detail:not(.show){display:block;position:fixed;left:0;right:0;bottom:0;z-index:61;max-width:540px;margin:0 auto;padding:10px 22px calc(24px + env(safe-area-inset-bottom,0px));border-radius:26px 26px 0 0;background:var(--card,#fff);box-shadow:0 -8px 40px #172c2314;max-height:82dvh;overflow-y:auto;overscroll-behavior:contain;transform:translate3d(0,calc(100% + 28px),0);visibility:hidden;pointer-events:none;transition:transform .38s cubic-bezier(.2,.8,.2,1),visibility 0s linear .38s}
+#detail.detail.show{transform:translate3d(0,0,0);visibility:visible;pointer-events:auto;transition-delay:0s}
+#detailMask.mask{display:block;z-index:60;background:#17271d40;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .3s ease,visibility 0s linear .38s}
+#detailMask.show{opacity:1;visibility:visible;pointer-events:auto;transition-delay:0s}
+.course-sheet-handle{width:32px;height:4px;background:#dce5dc;border-radius:4px;margin:0 auto 18px;touch-action:none}
+#detail .close{right:14px;top:16px;width:36px;height:36px;border:0;border-radius:50%;background:#f0f4ed;color:#68816c;font-size:23px;line-height:1;padding:0}
+.course-sheet-caption{display:block;font-size:10px;letter-spacing:1px;color:var(--muted);margin:0 40px 6px 0;touch-action:none}
+#detail h2{font-size:21px;line-height:1.5;letter-spacing:-.5px;margin:0 30px 15px 0;color:var(--green);overflow-wrap:anywhere}
+#detail dl{margin:0}#detail dl>div{display:grid;grid-template-columns:48px minmax(0,1fr);gap:14px;padding:9px 0;border-top:1px solid var(--line);font-size:12px;line-height:1.75}#detail dt{color:var(--muted)}#detail dd{margin:0;overflow-wrap:anywhere}
+body.course-sheet-open{overflow:hidden}#detail.instant,#detailMask.instant{transition:none!important}
+@media(prefers-reduced-motion:reduce){#detail.detail,#detailMask.mask{transition:none}}
+.main-tabbar{touch-action:pan-y;user-select:none;-webkit-user-select:none}.main-tabbar .nav-carry{transition:transform .38s cubic-bezier(.2,.85,.25,1),width .24s;will-change:transform}.main-tabbar.scrubbing .nav-carry{transition:none}.main-tabbar.scrubbing .main-tab{transform:none;color:#7c9180}.main-tabbar.scrubbing .main-tab.scrub-target{color:#174e31}.main-tabbar .main-tab.scrub-target .ic{transform:translateY(-1px) scale(1.06)}
+@media(prefers-reduced-motion:reduce){.main-tabbar .nav-carry{transition:none}}
+
+/* Quiet timetable: continuous, faint guides instead of seven broken cell borders. */
+#schedule table{--timetable-gap:2px;border-spacing:var(--timetable-gap)}
+#schedule tbody td.empty{border:0;background:transparent}
+#schedule tbody>tr:not(.divider){background:linear-gradient(to bottom,transparent calc(100% - 1px),#64856c12 0)}
+#schedule tr.divider{background:none}
+#schedule tr.divider td{border:0;height:18px;line-height:18px;letter-spacing:2px}
+#schedule tr.divider span{display:inline-flex;align-items:center;gap:9px;font-size:8px;color:#8e9d90}
+#schedule tr.divider span:before,#schedule tr.divider span:after{content:'';height:1px;width:24px;background:#7b997b29}
+/* The schedule actions share the same material preferences as the floating tabs. */
+#schedule .foot{background:rgba(249,255,245,var(--glass-alpha));border-radius:20px;padding:5px;gap:3px;bottom:calc(90px + env(safe-area-inset-bottom,0px))}
+html[data-glass=off] #schedule .foot{background:#f5f9f0}
+#schedule .foot button{position:relative;z-index:2;border-radius:14px;min-height:34px;background:transparent;color:var(--green);text-shadow:0 1px 3px #ffffffbf}
+#schedule .foot button:active{background:#43805413}
+#schedule .foot button:disabled{color:var(--muted)}
+#schedule .foot #btnReload:before{content:'';position:absolute;left:-2px;top:9px;bottom:9px;width:1px;background:#55775d24}
+.glass-optics{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-2;display:none}
+.glass-filter-defs{position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}
+/* The actual pages follow the navigation drag; lifecycle runs only after settling. */
+.app-brand-icon{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.brand-symbol,.login-emblem{overflow:hidden}
+.nav-page-stage{position:fixed;inset:0;z-index:20;overflow:hidden;background:var(--bg);pointer-events:none;contain:layout paint}
+.nav-page-pane{position:absolute;inset:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:none;will-change:transform;background:var(--bg);scrollbar-width:none}
+.nav-page-pane::-webkit-scrollbar{display:none}
+.nav-page-stage .nav-preview-page{display:block!important;min-height:100%;animation:none!important;transform:none!important}
+body.nav-page-dragging{overflow:hidden;overscroll-behavior:none}
+
+/* Custom schedules share course typography; time always follows the room. */
+#schedule .calendar-event{align-items:center;justify-content:center}
+#schedule .calendar-event .calendar-event-label{text-align:center;padding:4px 3px}
+#schedule .calendar-event .calendar-event-label strong{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:10px;font-weight:650;line-height:1.55;text-align:center;color:#344d43}
+#schedule .calendar-event .calendar-event-label .calendar-event-room{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;white-space:normal;overflow:hidden;font-size:9px;font-weight:400;line-height:1.4;text-align:center;color:#6b8176;margin-top:4px}
+#schedule .calendar-event .calendar-event-label .calendar-event-room:empty{display:none}
+#schedule .calendar-event .calendar-event-time{display:block;font-size:8px;font-weight:400;line-height:1.4;text-align:center;color:#6b8176;margin:4px 0 0;letter-spacing:-.3px}
+#schedule .calendar-event.is-short .calendar-event-time,#schedule .calendar-event.fixed-study .calendar-event-time{display:none!important}
+#schedule .calendar-event.is-short .calendar-event-label{padding:1px 3px}
+#schedule .calendar-event.is-short .calendar-event-label strong,#schedule .calendar-event.is-short .calendar-event-label .calendar-event-room{line-height:1.2}
+#schedule .calendar-event.is-short .calendar-event-label .calendar-event-room{margin-top:1px}
+#schedule .calendar-event.is-tiny .calendar-event-label{padding:1px 2px}
+#schedule .calendar-event.is-tiny .calendar-event-label strong,#schedule .calendar-event.is-tiny .calendar-event-label .calendar-event-room{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.1;margin-top:0}
+#schedule .calendar-event.fixed-study .calendar-event-label{padding:4px 3px}
+#schedule .calendar-event.fixed-study .calendar-event-label strong{line-height:1.55}
+#schedule .calendar-event.fixed-study .calendar-event-label .calendar-event-room{line-height:1.4;margin-top:4px}
+#schedule .calendar-event.fixed-study.is-tiny .calendar-event-label{padding:1px 2px}
+#schedule .calendar-event.fixed-study.is-tiny .calendar-event-label strong,#schedule .calendar-event.fixed-study.is-tiny .calendar-event-label .calendar-event-room{line-height:1.1;margin-top:0}
+@media(max-width:360px){#schedule .calendar-event .calendar-event-label strong{font-size:9px}}
+.settings-subpage .settings-body{padding-top:16px;padding-bottom:28px}
+.settings-subpage .topbar{gap:8px}.settings-subpage .topbar>.t{font-size:18px;text-align:center}.settings-header-space{width:62px;flex:0 0 62px}
+
+/* Keep the header stable while the balance surface opens beneath it. */
+#waterDevice .water-balance-card.folded{display:block}
+.water-balance-header{display:flex;align-items:center;min-height:44px}
+.water-balance-header .balance-fold{flex:1;min-width:0}
+#waterAccountFolded{margin:0;border:0;color:var(--green);background:none}
+.water-balance-reveal{overflow:hidden}
+.water-balance-reveal[hidden]{display:none}
+.scan-warning{font-size:11px;line-height:1.8;color:#b33832;background:#fff1ee;border:1px solid #f2d2cb;border-radius:10px;padding:9px 11px;margin:12px 0 0}
+.scan-warning strong{font-weight:600}

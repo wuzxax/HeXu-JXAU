@@ -1,0 +1,307 @@
+.theme-setting,.class-density{border:0;padding:0;margin:0 0 14px;min-width:0}
+.theme-setting legend,.class-density legend{font-weight:650;font-size:12px;margin:0 0 8px;padding:0}
+.theme-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:4px;border-radius:13px;background:var(--soft)}
+.theme-options label{position:relative;min-width:0;cursor:pointer}
+.theme-options input{position:absolute;width:1px;height:1px;opacity:0}
+.theme-options span{min-height:38px;display:grid;place-items:center;border:1px solid transparent;border-radius:10px;font-size:11px;color:var(--muted);transition:background-color .24s,color .24s}
+.theme-options input:checked+span,.theme-options .color-mode-selected span{color:var(--green);background:var(--card);border-color:var(--line);font-weight:650}
+.theme-options input:focus-visible+span{outline:2px solid var(--green2);outline-offset:1px}
+.class-pref-line{display:flex;align-items:center;gap:8px;margin:0 0 13px;font-size:12px}
+.class-pref-line label{flex:1;min-width:0}.class-lead-input{display:flex;align-items:center;gap:5px;color:var(--muted);white-space:nowrap}
+.class-pref-line :is(input,button){font:inherit;min-height:38px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--ink);padding:6px 9px}
+.class-pref-line input{width:59px;text-align:center}.class-pref-line button{color:var(--green);white-space:nowrap;cursor:pointer}
+.class-pref-line label small{display:block;color:var(--muted);font-size:10px;margin-top:3px}
+.class-pref-line #classDuration{width:70px}
+#schedulePreferences .settings-body{padding-top:10px}
+#schedulePreferences .settings-body>.settings-group{padding:10px 12px;margin-bottom:9px}
+#schedulePreferences .settings-row{min-height:46px;padding-block:6px}
+#schedulePreferences .class-live-heading h2{display:flex;align-items:center;gap:7px;margin:0;padding:0;font-size:14px}
+.class-test-label{border:1px solid var(--line);border-radius:5px;padding:1px 5px;background:var(--bg);color:var(--muted);font-size:10px;font-weight:550}
+#schedulePreferences .class-live-heading{padding-top:0}
+.class-live-heading .switch{flex-shrink:0}
+.class-disclosure{border-top:1px solid var(--line)}
+.class-disclosure>summary{display:flex;align-items:center;gap:8px;min-height:41px;list-style:none;font-size:12px;font-weight:650;cursor:pointer}
+.class-disclosure>summary::-webkit-details-marker{display:none}
+.class-disclosure>summary>span:last-child{width:7px;height:7px;margin-left:auto;margin-right:3px;border-right:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:rotate(45deg);transition:transform .3s ease}
+.class-disclosure[open]:not(.is-collapsing)>summary>span:last-child{transform:rotate(225deg)}
+.class-disclosure-body{display:flow-root}
+.class-disclosure-body.is-expanding{overflow:clip}
+#schedulePreferences .schedule-routine h2{font-size:13px;margin:0 0 2px;color:var(--green)}
+#schedulePreferences .schedule-routine{border-inline-start:3px solid color-mix(in srgb,var(--green) 40%,var(--line))}
+#schedulePreferences .night-routine{border-inline-start-color:color-mix(in srgb,var(--muted) 55%,var(--line))}
+@media(prefers-reduced-motion:reduce){.class-disclosure>summary>span:last-child{transition:none}}
+.class-device-list{display:grid;gap:8px;margin:0 0 8px;padding:8px 10px;border-radius:10px;background:var(--bg);font-size:11px;line-height:1.5}
+.class-device-list dt{font-weight:650}
+.class-device-list dd{margin:0;color:var(--muted)}
+#schedulePreferences .class-mode-actions{padding:0;gap:5px}
+#schedulePreferences .class-mode .preference-note{margin:5px 0 8px;line-height:1.45}
+#schedulePreferences .class-card-options .settings-link{border-top:1px solid var(--line)}
+#schedulePreferences .class-pref-line{margin-bottom:6px;gap:6px}
+#schedulePreferences .class-pref-line[hidden]{display:none}
+#schedulePreferences .class-density{margin-bottom:6px}
+#schedulePreferences .class-density legend{margin-bottom:4px}
+#schedulePreferences .class-density .theme-options span{min-height:34px}
+#schedulePreferences .morning-days-setting{padding-top:8px}
+#schedulePreferences :is(#morningDays,#nightDays){margin-block:6px}
+.book-detail .topbar{display:grid;grid-template-columns:1fr auto 1fr}
+.book-detail .topbar button{justify-self:start;white-space:nowrap;padding-inline:10px}
+.book-detail .settings-header-space{width:auto}
+.book-detail{min-height:100dvh;background:var(--bg)}
+.book-detail-body{padding-top:14px}
+.book-detail-summary{display:grid;grid-template-columns:90px minmax(0,1fr);align-items:center;gap:16px}
+.book-detail-cover,.book-detail-cover img{width:90px;height:120px;border-radius:8px}
+.book-detail-cover{overflow:hidden;background:var(--soft)}
+.book-detail-cover img{display:block;object-fit:cover}
+.book-detail-meta h1{font-size:20px;line-height:1.4;margin:0;overflow-wrap:anywhere}
+.book-detail-meta p,.book-detail-note{color:var(--muted);font-size:12px;margin:6px 0 0;overflow-wrap:anywhere}
+.book-detail-meta p:empty{display:none}
+.book-detail-section h2{font-size:15px;margin:0 0 8px}
+#bdAbs{font-size:13px;line-height:1.75;color:var(--ink);overflow-wrap:anywhere}
+.book-holding{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px 8px;padding:11px 0;border-bottom:1px solid var(--line)}
+.book-holding:last-child{border-bottom:0;padding-bottom:0}
+.book-holding small,.book-holding-location{color:var(--muted);font-size:11px}
+.book-holding small{margin-right:6px}
+.book-holding strong{color:var(--green);font-size:14px;overflow-wrap:anywhere}
+.book-holding-status{background:var(--soft);color:var(--muted);padding:3px 7px;border-radius:6px;font-size:10px;align-self:center}
+.book-holding-status.is-available{color:var(--green)}
+.book-holding-location{grid-column:1/-1}
+html[data-color-mode=dark] #bookDetail{background:var(--bg)}
+#openClassAliases{border-top:1px solid var(--line);padding-bottom:0}
+#openClassAliases:active,.class-alias-list .settings-row:active{background-color:var(--soft)}
+.class-alias-intro{padding:0 4px}
+.class-alias-list{padding:0 14px}
+.class-alias-list .settings-row>span:first-child{min-width:0;overflow-wrap:anywhere}
+.class-alias-list .settings-row b{font-size:14px}
+.class-alias-list .settings-row small{font-size:11px}
+.alias-custom{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.class-alias-form{display:grid;gap:10px}
+.class-alias-form label,.class-alias-heading small{font-size:12px;color:var(--muted)}
+.class-alias-heading h2{font-size:19px;line-height:1.45;overflow-wrap:anywhere;margin:5px 0 2px}
+.class-alias-preview{display:flex;align-items:center;flex-wrap:wrap;justify-content:space-between;gap:8px;background:var(--soft);color:var(--green);border-radius:12px;padding:12px;margin-bottom:6px;font-size:12px}
+.class-alias-preview b{font-size:14px}
+.class-alias-form input{margin:0;min-width:0}
+.class-alias-form .elec-btn{min-height:44px;margin-top:4px}
+.settings-subpage:is(#classAliases,#classAliasEditor) .topbar{display:grid;grid-template-columns:1fr auto 1fr}
+.settings-subpage:is(#classAliases,#classAliasEditor) .topbar button{justify-self:start;white-space:nowrap;padding-inline:10px}
+.settings-subpage:is(#classAliases,#classAliasEditor) .settings-header-space{width:auto}
+html[data-color-mode=dark] .style-options input:checked+.style-sample{border-color:var(--green)}
+
+/* The dock and its moving selection use separate translucent layers. */
+:root{--glass-rgb:247,255,245;--glass-rim:#ffffffb0;--glass-shade:#1f4a332f;--glass-label:#345640;--glass-active:#175336;--glass-glint:#ffffff6e;--glass-flat:#eff4ed}
+html[data-glass=real]{--glass-alpha:.085;--glass-blur:1.1px;--glass-saturation:1.34;--glass-carry:.17}
+html[data-glass=natural]{--glass-alpha:.27;--glass-blur:7px;--glass-saturation:1.42;--glass-carry:.32}
+html[data-glass=gentle]{--glass-alpha:.61;--glass-blur:15px;--glass-saturation:1.23;--glass-carry:.55}
+html[data-glass]:not([data-glass=off]) :is(.glass-surface,#schedule .foot){
+ background:linear-gradient(135deg,rgba(var(--glass-rgb),calc(var(--glass-alpha) + .08)),rgba(var(--glass-rgb),var(--glass-alpha)) 65%);
+ border:1px solid var(--glass-rim);
+ box-shadow:0 8px 22px var(--glass-shade);
+}
+html[data-glass]:not([data-glass=off]) :is(.glass-surface,#schedule .foot).has-optics{
+ -webkit-backdrop-filter:none;backdrop-filter:none;
+}
+html[data-glass]:not([data-glass=off]) .glass-surface.has-optics>.glass-optics{
+ display:block;
+ -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-saturation)) contrast(var(--glass-contrast));
+ backdrop-filter:blur(var(--glass-blur)) saturate(var(--glass-saturation)) contrast(var(--glass-contrast));
+}
+html[data-glass]:not([data-glass=off]) .glass-surface:before{display:none}
+html[data-glass]:not([data-glass=off]) .glass-surface:after{
+ inset:0;border:0;background:radial-gradient(ellipse at var(--touch-x,50%) var(--touch-y,50%),var(--glass-glint),transparent 92px);
+}
+html[data-glass]:not([data-glass=off]) .nav-carry{
+ border-color:transparent;background:rgba(var(--glass-rgb),var(--glass-carry));box-shadow:none;
+}
+.main-tab{color:var(--glass-label)}.main-tab.active{color:var(--glass-active)}
+#mainTabbar{border-radius:31px}#mainTabbar .nav-carry{border-radius:25px}
+@media(prefers-reduced-motion:reduce){.theme-options span{transition:none}}
+@media(prefers-reduced-transparency:reduce){
+ html[data-glass]:not([data-glass=off]) :is(.glass-surface,#schedule .foot){background:var(--glass-flat);-webkit-backdrop-filter:none;backdrop-filter:none}
+ html[data-glass]:not([data-glass=off]) .glass-surface.has-optics>.glass-optics{display:none}
+}
+
+html[data-color-mode=dark]{
+ color-scheme:dark;--bg:#101417;--card:#1b2227;--ink:#f1f5f8;--muted:#bcc9d1;--line:#44515b;--soft:#283641;
+ --green:#b2efcb;--green2:#93d5b2;--danger:#ffaaa5;--shadow:0 5px 18px #0003;
+ --night-raised:#242e36;--night-accent:#324657;--night-on-accent:#10241a;
+ --glass-rgb:38,47,60;--glass-flat:#27323d;--glass-label:#d8e1e9;--glass-active:#fff;
+ --glass-rim:#a8bdc04d;--glass-glint:#d2e1f261;--glass-shade:#0007;
+ --night-danger-bg:#342529;--night-danger-border:#7b5057;
+}
+html[data-color-mode=dark],
+html[data-color-mode=dark] :is(body,.topbar,.home-brand,.settings-subpage,#login){
+ background:var(--bg);color:var(--ink);
+}
+html[data-color-mode=dark] .topbar{
+ border-bottom:0;-webkit-backdrop-filter:none;backdrop-filter:none;
+}
+html[data-color-mode=dark] :is(.main-tab,#schedule .foot button){text-shadow:0 1px 4px #0009}
+html[data-color-mode=dark][data-glass=off] :is(.glass-surface,#schedule .foot){background:var(--glass-flat);border-color:var(--line)}
+html[data-color-mode=dark][data-glass=off] .nav-carry{background:var(--night-accent);border-color:var(--line)}
+html[data-color-mode=dark] :is(.card,.wheel-box,.modal-box,#detail.detail,.feature-empty,.grades-empty){
+ background-color:var(--card);color:var(--ink);border-color:var(--line);
+}
+html[data-color-mode=dark] :is(.topbar button,.small-btn,.settings-row,summary,.feature-heading p){color:var(--ink)}
+html[data-color-mode=dark] :is(.topbar button,.style-sample,.style-sample.reading,.style-sample.soft){
+ background:var(--night-raised);color:var(--ink);border-color:var(--line);
+}
+html[data-color-mode=dark] .theme-options :is(input:checked+span,.color-mode-selected span){
+ background:var(--night-accent);color:#dff6e6;border-color:#658574;
+}
+html[data-color-mode=dark] .style-sample i:first-child{background:#548166}
+html[data-color-mode=dark] :is(input,select,textarea,.small-btn,.plan-tabs,.plan-preview,.plan-widget-entry,.plan-widget-actions a,
+.plan-export-option,.plan-history button,.plan-change-row button,.plan-mode-options span,.plan-box select,.plan-box input,.plan-box #planSaveFile,
+.calendar-carry,.calendar-time-fields input,.calendar-carry button,.calendar-weeks button,.water-entry-switch,.week-brief,
+.wallet-grid,.feature-chip,.home-service-item,.home-service-icon,.home-water-choice button,.home-water-menu,.avatar-button,
+.book-search,.book-item,.cx-row,.cx-task,.water-device-row,.water-spend-group,.water-warning){
+ background:var(--night-raised);color:var(--ink);border-color:var(--line);
+}
+html[data-color-mode=dark] :is(.elec-btn,.plan-primary,.calendar-actions #mOk,.action-confirm [data-confirm-accept],.calendar-week-actions [aria-pressed=true],#nightDays [aria-pressed=true],#morningDays [aria-pressed=true],#mWeeks [aria-pressed=true]){background:#a1d2af;color:var(--night-on-accent);border-color:#a1d2af}
+html[data-color-mode=dark] :is(.plan-tab-indicator,.plan-mode-options input:checked+span,.water-device-row .device-btn,.class-pref-line button){background:var(--night-accent);color:var(--ink);border-color:var(--line)}
+html[data-color-mode=dark] :is(.calendar-event,.calendar-draft){background:var(--night-raised);border-color:#5a6650;color:#e8d3ad}
+html[data-color-mode=dark] :is(.calendar-event-room,.calendar-event-time,.tday-row .tm,.tday-row .bd .r,.week-info,.balance-note,.device-id,.wallet-item small){color:var(--muted)}
+html[data-color-mode=dark] :is(.tday-row.next,.tday-row.cur,.today-hero .d1,.water-metric,.cx-badge,.calendar-carry p){background:var(--soft);color:var(--green)}
+html[data-color-mode=dark] :is(.tday-row .bd .n,.balance-value,.feature-title,.wallet-value,.cx-task-title,.library-title){color:var(--ink)}
+html[data-color-mode=dark] :is(#schedule table,#schedule th,#schedule td:not(.c),#schedule td.slot,#schedule .schedule-head){background-color:var(--bg);color:var(--muted);border-color:var(--line)}
+html[data-color-mode=dark] :is(.notice-project,.notices-body pre,.notice-license,.style-sample i){background:var(--night-raised);color:var(--ink);border-color:var(--line)}
+
+html[data-color-mode=dark] :is(.cx-task,[style*="--course-bg"]) {--course-bg:var(--night-raised)!important;--course-color:var(--green)!important}
+html[data-color-mode=dark] :is(.toast,.brand-symbol,.balance-action,.home-service-icon){color:var(--ink)}
+html[data-color-mode=dark] :is(.brand-symbol,.calendar-actions #mOk){color:var(--night-on-accent);background:#a1d2af}
+html[data-color-mode=dark] :is(.calendar-event:not(.school-occurrence),.tday-row .bd .n,.book-title,.book-title a,.wallet-card .balance-value,.settings-name){color:var(--ink)}
+
+/* Only the tabs under the moving lens are repainted through the optics canvas. */
+.dock-glyph{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;line-height:1.5;white-space:nowrap;pointer-events:none}
+.dock-refraction{position:absolute;inset:-12px;width:calc(100% + 24px);height:calc(100% + 24px);pointer-events:none;z-index:3;display:none}
+html[data-glass]:not([data-glass=off]) #mainTabbar.optical-scrub{overflow:visible;border-color:transparent;box-shadow:0 8px 22px var(--glass-shade)}
+html[data-glass] #mainTabbar.optical-scrub::before,html[data-glass] #mainTabbar.optical-scrub::after{display:none}
+#mainTabbar.optical-scrub .dock-refraction{display:block}
+html[data-glass] #mainTabbar.optical-scrub .nav-carry{background:transparent;border-color:transparent;box-shadow:none}
+#mainTabbar.optical-scrub .main-tab,#mainTabbar.optical-scrub .main-tab .ic{transform:none}
+#mainTabbar.optical-scrub .main-tab{color:var(--glass-label);font-weight:500}
+
+html[data-color-mode=dark][data-glass=real]{--glass-alpha:.53;--glass-carry:.59}
+html[data-color-mode=dark][data-glass=natural]{--glass-alpha:.72;--glass-carry:.70}
+html[data-color-mode=dark][data-glass=gentle]{--glass-alpha:.87;--glass-carry:.83}
+html[data-color-mode=dark] :is(.glass-surface,.glass-surface.has-optics,#schedule .foot){color:var(--ink)}
+html[data-color-mode=dark] :is(.weekbar,.grade-card,.grades-tools,.grades-status,.parcel-platform-card,
+.parcel-service,.parcel-home,.lib-item,.lib-tabbar,.feature-segment,.library-tabs.lib-tabbar,.source-card,.water-detail-tabs,
+.wallet-card,.wallet-tile,.wallet-preview,.water-device-summary,.water-spend-group.bath,.cx-task.done,#cxWork .cx-work-head,
+.cx-question-card,.cx-work-question,.cx-work-choice,.cx-work-audio,.cx-load-audio,.cx-review-option,.cx-analysis-toggle,
+.cx-review-extra .cx-work-rich,.calc-card,.svc-group,.grid4 .g,#rangePicker,.avatar-dialog,.action-confirm){
+ background:var(--card);color:var(--ink);border-color:var(--line);
+}
+html[data-color-mode=dark] :is(.main-heading .actions button,.weekbar button,.calendar-carry button,
+#detail .close,.modal-btns .cancel,.action-confirm-buttons button:first-child,.range-head>button,.range-selection,
+.range-selection button,.range-month button,.date-range-button,.date-shortcuts button,.range-presets button,.fee-outline,
+.water-date-nav>button,.water-date-nav label,.parcel-pin,.parcel-options summary,.parcel-action,.parcel-kicker,
+.refresh-feedback,.refresh-feedback button,.morning-room-button,.usage-track,.water-spend-bar,.cx-work-actions button,
+.cx-review-option>b,.cx-state,.grade-badge,.count-badge,.tday-row>.ended-tag,.custom-tag,
+.calendar-fields>input,.calendar-fields>select,.calendar-time-fields input,.class-mode-actions a,.class-mode-actions button,
+#waterDevice .water-device-row,#waterDevice .device-mark,.home-water-menu button[aria-checked=true]){
+ background:var(--night-raised);color:var(--ink);border-color:var(--line);
+}
+html[data-color-mode=dark] :is(.feature-segment button.active,.library-tabs .lib-tab.active,.water-detail-tabs button.active,
+.date-shortcuts button.selected,#rangeDays button.in-range,.cx-work-choice:has(input:checked)){background:var(--night-accent);color:var(--ink);border-color:#66869b}
+html[data-color-mode=dark] .feature-filters .cx-filter{background:var(--night-raised);color:var(--muted);border-color:var(--line)}
+html[data-color-mode=dark] .feature-filters .cx-filter.active{background:var(--night-accent);color:var(--ink);border-color:#66869b}
+html[data-color-mode=dark] :is(#loginBtn,.fee-action,#rangeDays button.edge,.modal-btns .ok,
+.widget-help .action-confirm-buttons a,.cx-work-actions #cxWorkSubmit,#waterDevice .water-device-toolbar #waterScan){
+ background:var(--green);color:var(--night-on-accent);border-color:var(--green);
+}
+html[data-color-mode=dark] :is(.cx-answer-block,.cx-answer-block.analysis,.cx-analysis-toggle>summary,.cx-analysis-toggle>summary span,
+.grade-remark,.parcel-help,.water-bill-tag.other,.cx-task.done .cx-row-bottom){background:var(--night-raised);color:var(--ink);border-color:var(--line)}
+html[data-color-mode=dark] :is(.cx-answer-block.correct,.cx-review-option.is-correct,.cx-result.right,.grade-badge.pass,.cx-state.done){
+ background:#233b32;color:#baf3d0;border-color:#53786b
+}
+html[data-color-mode=dark] :is(.cx-answer-block.feedback,.cx-review-option.is-wrong,.cx-result.wrong,.grade-badge.fail){
+ background:#463137;color:#ffd3cc;border-color:#94676a
+}
+html[data-color-mode=dark] :is(.cx-answer-block h4,.cx-review-option>b,.cx-option-note,.grade-course p,.grade-result>span,
+.grade-card dt,.grades-footnote,.parcel-home small,.parcel-help b,.lib-item,.lib-item a,.range-week span,.range-status,
+.settings-row small,.field label,.tip,.lib-tab,.feature-segment button,#weekLabel small,thead th small,td.slot b,td.slot em,
+.calendar-carry p,.wheel-hint,.balance-value.unavailable,.wallet-bill small,.usage-row time){
+ color:var(--muted)
+}
+html[data-color-mode=dark] :is(.tday-row .tm,.tday-row.next .tm,.tday-row.cur .tm,.tday-row .bd .r,
+.tday-row.next .bd .r,.tday-row.cur .bd .r,.calendar-event-label .calendar-event-room,.calendar-event-time,.course-upcoming,.course-countdown){
+ color:#c3d9cf
+}
+html[data-color-mode=dark] :is(.tday-row,.tday-row.next,.tday-row.cur,#schedule tbody>tr:not(.divider)){background-color:transparent}
+html[data-color-mode=dark] :is(.tday-row.next,.tday-row.cur){background:var(--soft)}
+html[data-color-mode=dark] :is(.main-tab.active .ic,.lib-tab.active .ic,.parcel-arrow){color:var(--glass-active)}
+html[data-color-mode=dark] #mainTabbar.scrubbing .main-tab{color:var(--glass-label)}
+html[data-color-mode=dark] #mainTabbar.scrubbing .main-tab.scrub-target{color:var(--glass-active)}
+html[data-color-mode=dark] :is(.parcel-platform,.water-bill-tag,.water-bill-tag.bath,.cx-state.todo){
+ background:#303e4b;color:#e0eaf4;border-color:#526774
+}
+html[data-color-mode=dark] :is(.schedule-source.is-warning,.semester-cache-status.warning,.cx-deadline.urgent,.scan-warning,.refresh-feedback.warning){color:#ffc1a8}
+html[data-color-mode=dark] :is(.calendar-actions #mDel,.modal-btns .del,.err,#rangeError){color:var(--danger)}
+html[data-color-mode=dark] :is(input,textarea)::placeholder{color:#a6b6c1;opacity:1}
+html[data-color-mode=dark] .preview-control{color:var(--ink);text-shadow:0 1px 4px #000b}
+html[data-color-mode=dark] #schedule :is(.calendar-event strong,.calendar-event-label .calendar-event-room){color:var(--ink)}
+html[data-color-mode=dark] .switch .slider{background:#667582}
+html[data-color-mode=dark] .switch input:checked+.slider{background:#37906a}
+html[data-color-mode=dark] #today .today-hero{background:transparent;color:var(--ink);border-color:transparent}
+html[data-color-mode=dark] #today :is(#homeGreeting,.today-hero .d2){color:var(--ink)}
+html[data-color-mode=dark] #today :is(.today-hero .d3,.next-class-note span){color:#c6dad1}
+html[data-color-mode=dark] #tdNextClass:not(:empty){background:#293c34;color:#cef3d9;border-color:#48685a}
+html[data-color-mode=dark] #today .home-services-card{background:transparent}
+html[data-color-mode=dark] #today .home-service-item .home-service-icon{background:transparent;color:#d9f2e4}
+html[data-color-mode=dark] #today #tdLighting .lbl{color:#aae8cb}
+html[data-color-mode=dark] #today .balances-card :is(.balance-tile,.home-water-summary){border-color:var(--line)}
+html[data-color-mode=dark] .balance-tile:active{background:color-mix(in srgb,var(--night-raised) 70%,transparent)}
+html[data-color-mode=dark] #today .today-course-actions{border-color:var(--line)}
+html[data-color-mode=dark] #today .home-service-item{background:var(--card)}
+html[data-color-mode=dark] #settings .settings-logout{
+ margin-top:8px;min-height:44px;background:var(--night-danger-bg);border-color:var(--night-danger-border);color:var(--danger);font-weight:650
+}
+html[data-color-mode=dark] #settings .settings-logout:active{background:#4d3036}
+html[data-color-mode=dark] #settings.has-tabbar{
+ padding-bottom:calc(100px + env(safe-area-inset-bottom,0px));
+}
+html[data-color-mode=dark] #settings .settings-body{padding-bottom:20px}
+html[data-color-mode=dark] #waterDevice .water-device-row .device-edit{
+ display:grid;place-items:center;background:transparent;color:var(--muted);border:1px solid var(--line);border-radius:9px
+}
+html[data-color-mode=dark] #waterDevice .water-device-row .device-edit:active{background:var(--night-accent);color:var(--ink)}
+html[data-color-mode=dark] #waterDevice .water-device-row [data-action="start"]{background:var(--green);color:var(--night-on-accent)}
+html[data-color-mode=dark] #waterDevice .water-device-row [data-action="end"]{background:#492f24;color:#ffd8af}
+html[data-color-mode=dark] #waterDevice .water-device-row.has-request .device-id{color:#efba85}
+html[data-color-mode=dark] #waterDevice .water-device-row .device-recover{background:transparent;color:var(--green)}
+html[data-color-mode=dark] #waterDevice .water-device-row button:disabled{opacity:.5}
+html[data-color-mode=dark] #waterDevice .water-stats-card{background:transparent}
+html[data-color-mode=dark] #waterDevice .water-spend-group{background:var(--night-raised);border-color:var(--line)}
+html[data-color-mode=dark] #waterDevice .water-spend-group.bath{background:var(--card)}
+html[data-color-mode=dark] #schedule .calendar-event.school-occurrence{
+ background:var(--course-night,#233842);border-color:color-mix(in srgb,var(--course-night-edge,#7c9ba9) 62%,var(--course-night,#233842));
+ box-shadow:inset 2px 0 var(--course-night-edge,#7c9ba9)
+}
+html[data-color-mode=dark] #schedule .calendar-event.fixed-study{
+ background:#25392f;border-color:#547761;box-shadow:none
+}
+html[data-color-mode=dark] #schedule .calendar-event:not(.school-occurrence,.fixed-study){
+ background:#393128;border-color:#826a48
+}
+html[data-color-mode=dark] #schedule .calendar-event .calendar-event-label .calendar-event-room{color:#d1dfdf}
+html[data-color-mode=dark] #schedule :is(#weekLabel,.semester-cache-status.success,.morning-day-mark,.morning-room-button small){color:#b9eed0}
+html[data-color-mode=dark] #schedule :is(.schedule-source,#weekLabel small,tr.divider span){color:#bdcbc6}
+html[data-color-mode=dark] #schedule .schedule-source.is-warning{color:#ffc1a8}
+html[data-color-mode=dark] #schedule tr.divider span::before,
+html[data-color-mode=dark] #schedule tr.divider span::after{background:#52695e}
+
+html[data-color-mode=dark] :is(.modal,.wheel-modal){background-color:#070b0d80}
+html[data-color-mode=dark] .modal{backdrop-filter:blur(4px)}
+html[data-color-mode=dark] :is(.modal-box label,.time-wheel button,#morningDays button,#nightDays button){color:var(--muted)}
+html[data-color-mode=dark] :is(#morningDays [aria-pressed=true],#nightDays [aria-pressed=true]){color:var(--night-on-accent)}
+html[data-color-mode=dark] .time-wheel button[aria-selected=true]{color:var(--green)}
+html[data-color-mode=dark] .time-wheels>b{color:var(--green)}
+html[data-color-mode=dark] .modal-box :is(input,select,textarea):focus{
+ background:var(--night-raised);border-color:var(--green2);box-shadow:0 0 0 2px var(--night-accent);
+}
+html[data-color-mode=dark] .room-dialog .modal-box{border:1px solid var(--line)}
+html[data-color-mode=dark] .room-dialog .text-button:disabled{opacity:1;color:color-mix(in srgb,var(--muted) 70%,var(--card))}
+html[data-color-mode=dark] #waterSpendingDetail{
+ --water-chart-rule:color-mix(in srgb,var(--line) 47%,var(--card));
+}
+html[data-color-mode=dark] .water-detail-totals{border-color:var(--water-chart-rule,var(--line))}
+html[data-color-mode=dark] .water-chart-value em{color:var(--ink);text-shadow:0 0 3px var(--card),0 0 6px var(--card)}

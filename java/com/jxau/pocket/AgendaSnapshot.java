@@ -1,0 +1,21 @@
+package com.jxau.pocket;
+import org.json.*;
+import java.text.*;
+import java.util.*;
+/** Native validation and selection for encrypted offline widget snapshots. */
+public final class AgendaSnapshot {
+ public static JSONObject validate(JSONObject body)throws Exception{
+  JSONArray rows=body.optJSONArray("events");if(rows==null||rows.length()>4000)throw new IllegalArgumentException("日程数量过多");String scope=body.optString("scope");if(!scope.matches("[a-z0-9]{1,40}"))throw new IllegalArgumentException("日程来源无效");JSONArray out=new JSONArray();Set<String> seen=new HashSet<>();
+  for(int i=0;i<rows.length();i++){JSONObject r=rows.getJSONObject(i);String id=r.optString("id"),day=r.optString("day"),name=r.optString("name"),room=r.optString("room");int start=r.optInt("start",-1),end=r.optInt("end",-1);if(!id.matches("[a-z0-9]{1,40}")||!day.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}")||name.isEmpty()||name.length()>80||room.length()>120||start<0||start>=end||end>1440||!seen.add(day+"|"+id))throw new IllegalArgumentException("日程快照无效");epoch(day,start);out.put(new JSONObject().put("id",id).put("day",day).put("name",name).put("room",room).put("start",start).put("end",end).put("custom",r.optBoolean("custom")).put("liveCourse",r.optBoolean("liveCourse")).put("eveningStudy",r.optBoolean("eveningStudy",r.optBoolean("custom")&&!r.optBoolean("liveCourse")&&"晚自习".equals(name))).put("alias",CourseLabel.clean(r.optString("alias"),24)));}
+  JSONArray days=body.optJSONArray("cachedDays"),cleanDays=new JSONArray();if(days!=null&&days.length()<=370)for(int i=0;i<days.length();i++){String day=days.getString(i);if(!day.matches("[0-9]{4}-[0-9]{2}-[0-9]{2}"))throw new IllegalArgumentException("缓存日期无效");epoch(day,0);cleanDays.put(day);}return new JSONObject().put("cachedDays",cleanDays).put("scope",scope).put("known",body.optBoolean("known")).put("events",out).put("updatedAt",System.currentTimeMillis());
+ }
+ public static long epoch(String day,int minute)throws Exception{SimpleDateFormat f=new SimpleDateFormat("yyyy-MM-dd",Locale.US);f.setLenient(false);f.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));Date date=f.parse(day);Calendar c=Calendar.getInstance(TimeZone.getTimeZone("Asia/Shanghai"));c.setTime(date);c.set(Calendar.HOUR_OF_DAY,minute/60);c.set(Calendar.MINUTE,minute%60);return c.getTimeInMillis();}
+ public static String date(long now){SimpleDateFormat f=new SimpleDateFormat("yyyy-MM-dd",Locale.US);f.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai"));return f.format(new Date(now));}
+ public static boolean known(JSONObject data,String day){JSONArray days=data.optJSONArray("cachedDays");if(days!=null)for(int i=0;i<days.length();i++)if(day.equals(days.optString(i)))return true;return false;}
+ public static String hm(int minute){return String.format(Locale.US,"%02d:%02d",minute/60,minute%60);}
+ public static List<JSONObject> today(JSONObject data,long now)throws Exception{List<JSONObject> out=new ArrayList<>();String today=date(now);JSONArray rows=data.optJSONArray("events");if(rows!=null)for(int i=0;i<rows.length();i++){JSONObject e=rows.getJSONObject(i);if(today.equals(e.getString("day")))out.add(e);}Collections.sort(out,(a,b)->Integer.compare(a.optInt("start"),b.optInt("start")));return out;}
+ public static List<JSONObject> remaining(JSONObject data,long now)throws Exception{List<JSONObject> out=new ArrayList<>();for(JSONObject e:today(data,now))if(epoch(e.getString("day"),e.getInt("end"))>now)out.add(e);return out;}
+ public static String overview(JSONObject data,long now)throws Exception{int total=today(data,now).size(),left=remaining(data,now).size();return total==0?(known(data,date(now))?"今天没有安排":"课表尚未同步"):left==0?"今日安排已结束":"共 "+total+" 项 · 剩余 "+left+" 项";}
+ public static JSONObject focus(JSONObject data,long now)throws Exception{List<JSONObject> rows=today(data,now);for(JSONObject e:rows)if(epoch(e.getString("day"),e.getInt("start"))<=now&&epoch(e.getString("day"),e.getInt("end"))>now)return e;for(JSONObject e:rows)if(epoch(e.getString("day"),e.getInt("start"))>now)return e;return null;}
+ public static long nextBoundary(JSONObject data,long now)throws Exception{long next=epoch(date(now),1440);for(JSONObject e:today(data,now))for(String key:new String[]{"start","end"}){long at=epoch(e.getString("day"),e.getInt(key));if(at>now)next=Math.min(next,at);}return next;}
+}
