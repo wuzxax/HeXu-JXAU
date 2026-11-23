@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<script>window.__VER__="3.4.97";window.__BUILD__="由构建脚本写入";</script>
+<script>window.__VER__="3.5.11";window.__BUILD__="由构建脚本写入";</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#f5f6f8">
 <title>禾序</title>
@@ -22,6 +22,7 @@
 <link rel="stylesheet" href="css/overlay-scroll.css">
 <link rel="stylesheet" href="css/night-glass.css">
 <link rel="stylesheet" href="css/interface-styles.css">
+<link rel="stylesheet" href="css/control-styles.css">
 <script src="js/color-mode.js"></script>
 </head>
 <body>
@@ -31,7 +32,7 @@
     <div class="login-emblem" aria-hidden="true"><img class="app-brand-icon" src="img/hexu-icon.png" alt=""></div>
     <div class="logo">禾序</div>
     <div class="sub">江西农业大学 · 教务课表</div>
-    <p class="login-guide">用学号和学校统一身份认证密码登录。验证码填写图片中的计算结果，点图片可换一张。</p>
+    <p class="login-guide">用<strong>学号和学校统一身份认证密码</strong>登录。验证码填写<strong>图片中的计算结果</strong>，点图片可换一张。</p>
 
     <div class="field">
       <label for="u">学号</label>
@@ -141,7 +142,7 @@
    <button id="waterLoginAction" class="text-button" type="button">登录 798 <span aria-hidden="true">›</span></button>
   </aside>
   <section class="card water-balance-card"><div class="water-balance-header"><button id="waterBalanceToggle" class="balance-fold" type="button" aria-expanded="true" aria-controls="waterBalanceBody"><span>水卡余额</span><span class="fold-caption">收起 ⌃</span></button><button id="waterAccountFolded" class="text-button hidden" type="button">账号管理 ›</button></div><div id="waterBalanceBody"><div class="section-heading"><h2>校园用水余额</h2><span id="waterBalanceTime" class="lbl">—</span></div><div id="waterBalance" class="water-balance">—</div><div id="waterWalletName" class="lbl"></div><button id="waterManage" class="text-button" type="button">账号与钱包管理 ›</button></div></section>
-  <section class="card water-devices-card"><div class="water-devices-header"><button id="waterDevicesToggle" type="button" class="balance-fold" aria-expanded="true" aria-controls="waterDevicesBody"><span>我的饮水机 <small id="waterDeviceCount" class="lbl">—</small></span><span class="fold-caption">收起 ⌃</span></button></div><div id="waterDevicesBody"><div id="waterDeviceList"></div><div class="water-device-heading water-device-toolbar"><button id="waterScan" type="button" class="text-button" aria-label="扫码添加设备">▣ 扫码添加</button><button id="waterDeviceAdd" type="button" class="text-button" aria-label="手动输入设备号">＋ 手动输入</button></div><div id="waterDeviceStatus" class="lbl" role="status" aria-live="polite" tabindex="0"></div><a class="water-widget-link" href="jxau-pocket://water/widget">添加接水桌面小组件 ↗</a></div></section>
+  <section class="card water-devices-card"><div class="water-devices-header"><button id="waterDevicesToggle" type="button" class="balance-fold" aria-expanded="true" aria-controls="waterDevicesBody"><span>我的饮水机 <small id="waterDeviceCount" class="lbl">—</small></span><span class="fold-caption">收起 ⌃</span></button></div><div id="waterDevicesBody"><div id="waterDeviceList"></div><div class="water-device-heading water-device-toolbar"><button id="waterScan" type="button" class="text-button" aria-label="扫码添加设备"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3H4a1 1 0 0 0-1 1v3m10-4h3a1 1 0 0 1 1 1v3m0 6v3a1 1 0 0 1-1 1h-3m-6 0H4a1 1 0 0 1-1-1v-3m0-3h14"/></svg>扫码添加</button><button id="waterDeviceAdd" type="button" class="text-button" aria-label="手动输入设备号"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="15" height="11" rx="2"/><path d="M6 8h.5m3.25 0h.5m3.25 0h.5M6 12h.5m3.25 0H14"/></svg>手动输入</button></div><div id="waterDeviceStatus" class="lbl" role="status" aria-live="polite" tabindex="0"></div><a class="water-widget-link" href="jxau-pocket://water/widget">添加接水桌面小组件 ↗</a></div></section>
   <section class="card water-stats-card" aria-labelledby="waterStatsTitle">
    <div class="section-heading"><div><h2 id="waterStatsTitle">用水花费</h2><p class="water-stats-sub">饮水与洗浴，分开看更清楚</p></div><button id="waterStatsRefresh" class="text-button" type="button">更新统计</button></div>
    <p id="waterStatsStatus" class="water-stats-status" role="status" aria-live="polite">正在读取消费统计…</p>
@@ -199,15 +200,16 @@
 </div>
 
 <div id="schedule" class="hidden has-tabbar">
+  <div class="schedule-wallpaper" id="scheduleWallpaper" hidden aria-hidden="true"><img alt=""></div>
   <div class="topbar main-heading">
     <div class="t">课表</div>
     <div class="actions">
-      <button id="planTools" aria-label="调休、导出与课表工具">工具</button><button id="btnAdd2">＋ 添加</button>
+      <button id="planTools" aria-label="课表工具">工具</button><button id="btnAdd2">＋ 添加</button>
     </div>
   </div>
 
   <div class="weekbar">
-    <div id="weekLabel">第 1 周</div>
+    <div id="weekLabel" class="schedule-week-label">第 1 周</div>
     <div id="scheduleSource" class="schedule-source" role="status"></div>
     <div id="semesterCacheStatus" class="semester-cache-status" role="status" aria-live="polite"></div>
   </div>
@@ -333,6 +335,17 @@
   </div>
   <div class="elec-body settings-body">
     <div class="card account-card"><span class="account-mark" data-icon="user" aria-hidden="true"></span><div><span class="settings-caption">校园账号</span><div id="setUser">—</div></div></div>
+    <details class="card settings-binding" data-animated-disclosure>
+      <summary>账号与绑定<span class="binding-summary-end">管理<i class="disclosure-chevron" aria-hidden="true"></i></span></summary>
+      <div class="disclosure-body">
+        <div id="bindingState" class="reader-extra lbl"></div>
+        <div class="settings-binding-actions">
+          <button id="rebindPortal" class="small-btn" type="button">重新登录门户</button>
+          <button id="rebindElec" class="small-btn" type="button">重新绑定电费</button>
+          <button id="unbindElec" class="small-btn" type="button">解绑电费</button>
+        </div>
+      </div>
+    </details>
     <div class="settings-caption group-label">偏好设置</div>
     <div class="card settings-group">
       <button type="button" id="openAppearanceSettings" class="settings-row settings-link"><span><b>界面与质感</b><small>界面风格 · 液态玻璃 · 点触光感</small></span><span aria-hidden="true">›</span></button>
@@ -344,7 +357,7 @@
       <button type="button" id="openFeedback" class="settings-row settings-link"><span><b>问题与建议反馈</b><small>加入禾序反馈群 · 一起把禾序变得更好</small></span><span aria-hidden="true">›</span></button>
       <button type="button" id="openNotices" class="settings-row settings-link"><span><b>开源声明与致谢</b><small>第三方许可 · 设计参考</small></span><span aria-hidden="true">›</span></button>
 <button type="button" id="diagEntry" class="settings-row settings-link"><span><b>自检诊断</b><small>检查数据源连接状态</small></span><span class="settings-chevron" aria-hidden="true">›</span></button>
-      <div class="settings-row settings-version"><span>版本号</span><span id="setVer">—</span></div>
+      <button id="openAppUpdate" class="settings-row settings-link" type="button"><span><b>版本与更新</b><small id="updateSummary">当前版本 <span id="setVer">—</span><span id="updateAvailable" hidden></span></small></span><span aria-hidden="true">›</span></button>
     </div>
     <button type="button" id="forgetPassword" class="settings-row settings-link hidden"><span><b>删除已保存的校园密码</b><small>保留当前登录状态，过期后需重新输入</small></span><span aria-hidden="true">›</span></button>
     <button id="btnLogout" class="settings-logout" type="button">退出登录</button>
@@ -356,24 +369,25 @@
   <div class="elec-body settings-body guide-body">
     <section class="card guide-section" aria-labelledby="guideCampus">
       <h2 id="guideCampus">校园账号</h2>
-      <p>用学号和学校统一身份认证密码登录，输入图片中算式的结果。课表刷新、成绩查询和个人借阅记录需要有效的校园登录状态。</p>
-      <p>登录过期后，可点首页「刷新课表」，或到「我的 → 账号与绑定」重新登录。已缓存的课表可离线查看。</p>
+      <p>用<strong>学号和学校统一身份认证密码</strong>登录，验证码填写<strong>图片中的计算结果</strong>。课表刷新、成绩查询和个人借阅记录需要有效的校园登录状态。</p>
+      <p>登录过期后，可点首页「刷新课表」，或到<strong>「我的 → 账号与绑定」</strong>重新登录。<strong>已缓存的课表可离线查看。</strong></p>
     </section>
     <section class="card guide-section" aria-labelledby="guideSchedule">
       <h2 id="guideSchedule">课表与日程</h2>
-      <p>左右滑动切换周次，点课程看详情。点课表空白处或「＋ 添加」新建日程；点已有日程可编辑。</p>
-      <p>在「工具」里可以调休、补课、导出课表或添加桌面组件。课程上岛可在「我的 → 课表设置」开启并试发。</p>
+      <p>左右滑动切换周次，点课程看详情。<strong>点课表空白处或「＋ 添加」</strong>新建日程，点已有日程可编辑。</p>
+      <p>在「工具」里可以调休、补课、导出课表或添加桌面组件。在<strong>「我的 → 课表设置」</strong>可试发课程上岛，也能查看自动免打扰和后台运行所需权限。</p>
+      <p><strong>晚自习与早检可在课表设置内关闭。</strong></p>
       <button type="button" class="text-button" data-guide-route="schedule">查看课表 <span aria-hidden="true">›</span></button>
     </section>
     <section class="card guide-section" aria-labelledby="guideHomework">
       <h2 id="guideHomework">学习通作业</h2>
-      <p>在「学习通」点「绑定学习通」，用学习通手机号或学号和密码连接。作业可按截止时间或课程查看，点作业进入详情。</p>
+      <p>在「学习通」点<strong>「绑定学习通」</strong>，使用学习通手机号或学号及密码登录。作业可按截止时间或课程查看，点作业进入详情。</p>
       <button type="button" class="text-button" data-guide-route="chaoxing">打开学习通 <span aria-hidden="true">›</span></button>
     </section>
     <section class="card guide-section" aria-labelledby="guideWater">
       <h2 id="guideWater">798 接水与花费</h2>
-      <p>进入「接水 → 账号与钱包管理」，输入 798 手机号，先完成图形验证码，再用短信验证码绑定。收起余额时可点「账号管理」。</p>
-      <p>扫饮水机上的设备码或手动输入编号，保存后点设备卡片上的「接水」。发出请求后在水机上确认，用完点「结束」。饮水和洗浴花费可分别查看趋势。</p>
+      <p>进入<strong>「接水 → 账号与钱包管理」</strong>，输入 798 手机号，依次完成<strong>图形验证码和短信验证码</strong>。收起余额时可点「账号管理」。</p>
+      <p>扫饮水机上的设备码或手动输入编号，保存后点设备卡片上的「接水」。发出请求后，<strong>在水机上确认出水</strong>，用完点<strong>「结束」</strong>。饮水和洗浴花费可分别查看趋势。</p>
       <button type="button" class="text-button" data-guide-route="waterDevice">前往接水 <span aria-hidden="true">›</span></button>
     </section>
     <section class="card guide-section" aria-labelledby="guideServices">
@@ -385,6 +399,26 @@
 </div>
 
 <div id="feedback" class="hidden settings-subpage"><div class="topbar"><button id="feedbackBack" type="button">‹ 我的</button><div class="t">问题与建议反馈</div><span class="settings-header-space" aria-hidden="true"></span></div><div class="feedback-body"><div class="feedback-intro"><h1>一起，让禾序更好用</h1><p>遇到问题或有改进建议，欢迎加入 QQ 反馈群交流，也可在群内获取最新版本。</p></div><div class="feedback-contact"><label>QQ 反馈群<input id="feedbackGroup" readonly value="1136772068" aria-label="反馈QQ群号"></label><button id="feedbackCopy" type="button">复制群号</button></div><p class="feedback-hint">复制群号后，在 QQ 中搜索并申请加入。反馈时请附上问题页面、操作步骤和版本号，方便定位。</p></div></div>
+<div id="appUpdate" class="hidden settings-subpage">
+  <div class="topbar"><button id="appUpdateBack" type="button">‹ 我的</button><div class="t">版本与更新</div><span class="settings-header-space" aria-hidden="true"></span></div>
+  <div class="elec-body settings-body update-body">
+    <section class="card update-card" aria-label="版本信息">
+      <dl class="update-versions"><div><dt>当前版本</dt><dd id="updateCurrent">—</dd></div><div><dt>GitHub 最新版</dt><dd id="updateLatest">—</dd></div></dl>
+      <p id="updateStatus" role="status" aria-live="polite">正在检查更新…</p>
+      <div class="update-actions">
+        <a id="updateDownload" class="update-download hidden">下载更新</a>
+        <button id="updateCheck" type="button" class="small-btn">检查更新</button>
+      </div>
+      <div class="update-links">
+        <button id="updateGroup" type="button" class="text-button">可加群获取最新版本 ›</button>
+        <a id="updateRelease" href="https://github.com/wuzxax/HeXu-JXAU/releases/latest">GitHub 发布页 ↗</a>
+      </div>
+    </section>
+    <section id="updateNotes" class="card hidden" aria-labelledby="updateNotesTitle">
+      <h2 id="updateNotesTitle">更新说明</h2><p id="updateNotesText"></p>
+    </section>
+  </div>
+</div>
 <div id="appearanceSettings" class="hidden settings-subpage"><div class="topbar"><button id="appearanceSettingsBack" type="button">‹ 我的</button><div class="t">界面与质感</div><span class="settings-header-space" aria-hidden="true"></span></div><div class="elec-body settings-body">    <section class="card appearance-settings" aria-label="界面风格设置">
       <fieldset class="theme-setting"><legend>夜间模式</legend><div class="theme-options" role="group" aria-label="夜间模式">
        <label><input type="radio" name="colorMode" value="system"><span>跟随系统</span></label>
@@ -407,7 +441,31 @@
       <div class="settings-row"><span><b>点触光感</b><small>轻触玻璃时，光感随指尖出现</small></span><label class="switch"><input type="checkbox" id="glassTouch" aria-label="点触光感"><span class="slider"></span></label></div>
     </section>
 </div></div>
-<div id="schedulePreferences" class="hidden settings-subpage"><div class="topbar"><button id="schedulePreferencesBack" type="button">‹ 我的</button><div class="t">课表设置</div><span class="settings-header-space" aria-hidden="true"></span></div><div class="elec-body settings-body">    <section class="card settings-group"><button type="button" id="settingsPlanTools" class="settings-row settings-link"><span><b>调休、导出与桌面组件</b><small>单次修改、学校补课与课表分享</small></span><span>›</span></button></section><section class="card settings-group class-mode" aria-labelledby="classModeTitle">
+<div id="scheduleBackground" class="hidden settings-subpage">
+  <div class="topbar"><button id="scheduleBackgroundBack" type="button">‹ 课表</button><div class="t">课表背景</div><span class="settings-header-space" aria-hidden="true"></span></div>
+  <div class="elec-body settings-body schedule-background-body">
+    <section class="card schedule-background-editor">
+      <div id="bgPreview" class="bg-preview" aria-hidden="true" inert>
+        <div class="bg-preview-viewport">
+          <div class="bg-preview-screen">
+            <div class="schedule-wallpaper" hidden><img id="bgPreviewImage" alt=""></div>
+            <div class="topbar main-heading"><div class="t">课表</div><div class="actions"><button type="button">工具</button><button type="button" class="bg-preview-add">＋ 添加</button></div></div>
+            <div class="weekbar"><div class="schedule-week-label"></div><div class="schedule-source"></div><div class="semester-cache-status"></div></div>
+            <div class="table-wrap"><div class="page"></div></div>
+            <div class="foot glass-surface"><button type="button">回到本周</button><button type="button">刷新</button></div>
+          </div>
+        </div>
+        <div class="bg-preview-confirm" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 12 4 4 8-8"/></svg></div>
+      </div>
+      <input id="bgFile" type="file" accept="image/*" hidden>
+      <label class="bg-strength" for="bgStrength"><span>背景浓度</span><input id="bgStrength" type="range" min="10" max="55" value="26" disabled><output id="bgStrengthValue" for="bgStrength">26%</output></label>
+      <p id="bgStatus" class="preference-note" role="status" aria-live="polite">选择一张图片预览课表效果。</p>
+      <div class="bg-actions"><button id="bgChoose" class="small-btn" type="button">选择图片</button><button id="bgSave" class="elec-btn" type="button" disabled>应用背景</button></div>
+      <button id="bgRemove" class="text-button" type="button" disabled>恢复默认背景</button>
+    </section>
+  </div>
+</div>
+<div id="schedulePreferences" class="hidden settings-subpage"><div class="topbar"><button id="schedulePreferencesBack" type="button">‹ 我的</button><div class="t">课表设置</div><span class="settings-header-space" aria-hidden="true"></span></div><div class="elec-body settings-body">    <section class="card settings-group"><button type="button" id="settingsPlanTools" class="settings-row settings-link"><span><b>调休、导出与桌面组件</b><small>单次修改、学校补课与课表分享</small></span><span>›</span></button></section><section class="card settings-group"><button type="button" id="openScheduleBackground" class="settings-row settings-link"><span><b>课表背景</b><small>选择本机图片并调整浓度</small></span><span aria-hidden="true">›</span></button></section><section class="card settings-group class-mode" aria-labelledby="classModeTitle">
  <div class="settings-row class-live-heading">
   <div><h2 id="classModeTitle">课程上岛 <span class="class-test-label">测试</span></h2><small id="classLiveDescription">在状态栏显示课程简称与教室</small></div>
   <label class="switch"><input type="checkbox" role="switch" id="classLive" aria-label="课程上岛" disabled><span class="slider"></span></label>
@@ -419,9 +477,10 @@
   <button id="classPreview" type="button" hidden>试发 2 分钟</button>
  </div>
  <p id="classLiveStatus" class="preference-note" role="status"></p>
- <details class="class-disclosure">
-  <summary>适配机型 <span aria-hidden="true"></span></summary>
-  <div class="class-disclosure-body">
+ <p id="classLiveBackgroundHint" class="class-background-hint" role="status" hidden>建议允许后台运行，减少锁屏后上岛延迟。 <a href="jxau-pocket://schedule/class-permission/battery">电池优化设置</a></p>
+ <details class="class-disclosure" data-animated-disclosure>
+  <summary>适配机型 <span class="disclosure-chevron" aria-hidden="true"></span></summary>
+  <div class="class-disclosure-body disclosure-body">
   <dl class="class-device-list">
    <div><dt>vivo、iQOO</dt><dd>Android 13 及以上的 OriginOS 原子岛</dd></div>
    <div><dt>小米、Redmi、POCO、黑鲨</dt><dd>Android 13 及以上的 HyperOS 超级岛</dd></div>
@@ -431,9 +490,9 @@
   <p class="preference-note">具体型号和系统版本请以本机试发效果为准。</p>
   </div>
  </details>
- <details class="class-disclosure class-card-options" id="classCardOptions" hidden>
-  <summary>显示设置 <span aria-hidden="true"></span></summary>
-  <div class="class-disclosure-body">
+ <details class="class-disclosure class-card-options" id="classCardOptions" data-animated-disclosure hidden>
+  <summary>显示设置 <span class="disclosure-chevron" aria-hidden="true"></span></summary>
+  <div class="class-disclosure-body disclosure-body">
   <form id="classLeadForm" class="class-pref-line">
    <label for="classLead">提前上岛</label><span class="class-lead-input"><input id="classLead" type="number" min="0" max="60" value="10" inputmode="numeric" required> 分钟</span><button type="submit">保存</button>
   </form>
@@ -456,15 +515,24 @@
   </div>
  </details>
 </section><section class="card settings-group class-mode" aria-label="上课自动免打扰">
- <div class="settings-row"><span><b>上课自动免打扰</b><small>按课表时段开启，安排结束后自动退出。</small></span><label class="switch"><input type="checkbox" role="switch" id="classQuiet" aria-label="上课自动免打扰" disabled><span class="slider"></span></label></div>
+ <div class="settings-row"><span><b>上课自动免打扰</b><small>按课表时段开启，安排结束后自动退出。</small></span><span class="class-quiet-control"><label class="switch"><input type="checkbox" role="switch" id="classQuiet" aria-label="上课自动免打扰" disabled><span class="slider"></span></label><a id="classQuietEnableAccess" hidden aria-label="授权并开启上课自动免打扰"></a></span></div>
  <div id="classQuietCustomRow" class="settings-row hidden"><span><b>包含自定义日程</b><small>按添加到课表的日程时间切换</small></span><label class="switch"><input type="checkbox" role="switch" id="classQuietCustom" aria-label="包含自定义日程" disabled><span class="slider"></span></label></div>
  <div id="classQuietStudyRow" class="settings-row hidden"><span><b>包含晚自习</b><small>跟随课表里设置的星期、周次和时段</small></span><label class="switch"><input type="checkbox" role="switch" id="classQuietStudy" aria-label="包含晚自习" disabled><span class="slider"></span></label></div>
  <div class="class-mode-actions">
-  <a id="classQuietAccess" hidden href="jxau-pocket://schedule/class-permission/quiet">授权免打扰</a>
-  <a id="classAlarmAccess" hidden href="jxau-pocket://schedule/class-permission/alarms">允许准时切换</a>
-  <a id="classRule" hidden href="jxau-pocket://schedule/class-permission/rules">系统规则</a>
+  <a id="classQuietAccess" hidden href="jxau-pocket://schedule/class-permission/quiet">授予禾序勿扰访问权限</a>
  </div>
  <p id="classQuietStatus" class="preference-note" role="status"></p>
+ <p id="classQuietBackgroundHint" class="class-background-hint" role="status" hidden>建议允许后台运行，减少上下课切换延迟。 <a href="jxau-pocket://schedule/class-permission/battery">电池优化设置</a></p>
+</section>
+<section id="classBackground" class="card settings-group class-mode" aria-labelledby="classBackgroundTitle" hidden>
+ <div class="settings-row"><span><b id="classBackgroundTitle">后台运行</b><small>适用于课程上岛和上课免打扰</small></span></div>
+ <div class="class-mode-actions">
+  <a id="classAlarmAccess" hidden href="jxau-pocket://schedule/class-permission/alarms">允许闹钟与提醒</a>
+  <a id="classBatteryAccess" hidden href="jxau-pocket://schedule/class-permission/battery">允许后台活动</a>
+  <a href="jxau-pocket://schedule/class-permission/app-info">系统应用设置</a>
+ </div>
+ <p id="classBackgroundStatus" class="preference-note" role="status"></p>
+ <p id="classBoundaryStatus" class="preference-note" role="status"></p>
 </section><section class="card settings-group schedule-routine morning-routine" aria-labelledby="morningRoutineTitle">
       <h2 id="morningRoutineTitle">早检</h2>
       <div class="settings-row"><span><b>显示早检教室</b><small><span id="morningTimeSummary">同步开启早检提醒 · 07:25–07:30</span></small></span><label class="switch"><input type="checkbox" id="swMorning" aria-label="显示早检教室与提醒"><span class="slider"></span></label></div>
@@ -508,7 +576,7 @@
   <button class="main-tab" data-tab="settings"><span class="ic" data-icon="user" aria-hidden="true"></span>我的</button>
 </div>
 
-<div id="notices" class="hidden"><div class="topbar"><button id="noticesBack" type="button">‹ 我的</button><div class="t">开源声明与致谢</div><span class="settings-header-space" aria-hidden="true"></span></div><div class="elec-body notices-body" id="noticesContent"><h1>开源声明与致谢</h1><p>感谢开源社区的贡献。第三方项目的版权及许可归各权利人所有。</p><h2>使用的开源组件</h2><div class="notice-projects"><article class="notice-project"><h3>zxing-wasm 3.1.7</h3><p>Ze-Zheng Wu · MIT</p><p>本地二维码识别；不上传相册图片或摄像头画面</p><a href="https://github.com/Sec-ant/zxing-wasm">github.com/Sec-ant/zxing-wasm</a><a class="notice-license-link" href="https://opensource.org/license/mit">查看许可 ↗</a></article><article class="notice-project"><h3>ZXing-C++ / ZXingWasm C++</h3><p>ZXing authors / Sec-ant · Apache-2.0</p><p>本地二维码识别；不上传相册图片或摄像头画面</p><a href="https://github.com/zxing-cpp/zxing-cpp">github.com/zxing-cpp/zxing-cpp</a><a class="notice-license-link" href="https://www.apache.org/licenses/LICENSE-2.0">查看许可 ↗</a></article><article class="notice-project"><h3>zint（解码器发行包附带声明）</h3><p>Zint authors · BSD-3-Clause</p><p>本地二维码识别；不上传相册图片或摄像头画面</p><a href="https://github.com/zint/zint">github.com/zint/zint</a><a class="notice-license-link" href="https://opensource.org/license/bsd-3-clause">查看许可 ↗</a></article><article class="notice-project"><h3>jsoup 1.23.2</h3><p>Jonathan Hedley · MIT</p><p>解析学校与学习通网页</p><a href="https://github.com/jhy/jsoup">github.com/jhy/jsoup</a><a class="notice-license-link" href="https://opensource.org/license/mit">查看许可 ↗</a></article><article class="notice-project"><h3>jsQR 1.4.0</h3><p>Cozmo / jsQR contributors · Apache-2.0</p><p>本机摄像头、相册二维码识别</p><a href="https://github.com/cozmo/jsQR">github.com/cozmo/jsQR</a><a class="notice-license-link" href="https://www.apache.org/licenses/LICENSE-2.0">查看许可 ↗</a></article></div><h2>当前功能与交互参考</h2><article class="notice-project"><h3>Sleepy 课程表</h3><p>lingion · GPL-3.0</p><p>单次课程、调休、课表导出、上课设置和玻璃外观参考；本版独立实现，未复制或打包其源码</p><a href="https://github.com/lingion/sleepy">github.com/lingion/sleepy</a><a href="https://github.com/lingion/sleepy/blob/main/LICENSE">项目许可 ↗</a></article><p>以下项目用于公开协议、功能或设计思路参考，未引入其运行库或复制项目代码。life-798 登录适配亦感谢 YechoY 在 issue #32 的协议说明。</p><div class="notice-projects"><article class="notice-project"><h3>life-798</h3><p>nocookies111 · MIT</p><p>798 登录、接水与账单接口参考</p><a href="https://github.com/nocookies111/life-798">github.com/nocookies111/life-798</a><a class="notice-license-link" href="https://opensource.org/license/mit">查看许可 ↗</a></article><article class="notice-project"><h3>ocsjs</h3><p>ocsjs · MIT</p><p>学习通题型和表单字段参考</p><a href="https://github.com/ocsjs/ocsjs">github.com/ocsjs/ocsjs</a><a class="notice-license-link" href="https://opensource.org/license/mit">查看许可 ↗</a></article><article class="notice-project"><h3>yatori-go-core</h3><p>yatori-dev · MIT</p><p>学习通作业题型识别参考</p><a href="https://github.com/yatori-dev/yatori-go-core">github.com/yatori-dev/yatori-go-core</a><a class="notice-license-link" href="https://opensource.org/license/mit">查看许可 ↗</a></article><article class="notice-project"><h3>obsidian-chaoxing</h3><p>YukiHimeno · 未明确声明</p><p>学习通页面和提交字段参考</p><a href="https://github.com/YukiHimeno/obsidian-chaoxing">github.com/YukiHimeno/obsidian-chaoxing</a></article><article class="notice-project"><h3>onetake</h3><p>feitangyuan · PolyForm Noncommercial 1.0.0</p><p>界面与交互设计参考；未引入项目运行库</p><a href="https://github.com/feitangyuan/onetake">github.com/feitangyuan/onetake</a><a class="notice-license-link" href="https://github.com/feitangyuan/onetake/blob/main/LICENSE">查看许可 ↗</a></article><article class="notice-project"><h3>liquid-glass-react</h3><p>rdev · MIT</p><p>界面与交互设计参考；未引入项目运行库</p><a href="https://github.com/rdev/liquid-glass-react">github.com/rdev/liquid-glass-react</a><a class="notice-license-link" href="https://github.com/rdev/liquid-glass-react/blob/master/LICENSE">查看许可 ↗</a></article><article class="notice-project"><h3>liquid-glass</h3><p>shuding · MIT</p><p>界面与交互设计参考；未引入项目运行库</p><a href="https://github.com/shuding/liquid-glass">github.com/shuding/liquid-glass</a><a class="notice-license-link" href="https://github.com/shuding/liquid-glass/blob/main/LICENSE">查看许可 ↗</a></article><article class="notice-project"><h3>AndroidLiquidGlass</h3><p>Kyant0 · Apache-2.0</p><p>界面与交互设计参考；未引入项目运行库</p><a href="https://github.com/Kyant0/AndroidLiquidGlass">github.com/Kyant0/AndroidLiquidGlass</a><a class="notice-license-link" href="https://github.com/Kyant0/AndroidLiquidGlass/blob/kmp/LICENSE">查看许可 ↗</a></article></div><h2>随包许可文本</h2><p>许可链接便于查看原文；随包分发的组件版权与许可同时保留在本机，离线也可阅读。</p><details class="notice-license"><summary>zint-LICENSE.txt · 展开许可全文</summary><pre>
+<div id="notices" class="hidden"><div class="topbar"><button id="noticesBack" type="button">‹ 我的</button><div class="t">开源声明与致谢</div><span class="settings-header-space" aria-hidden="true"></span></div><div class="elec-body notices-body" id="noticesContent"><h1>开源声明与致谢</h1><p>感谢开源社区的贡献。第三方项目的版权及许可归各权利人所有。</p><h2>使用的开源组件</h2><div class="notice-projects"><article class="notice-project"><h3>zxing-wasm 3.1.7</h3><p>Ze-Zheng Wu · MIT</p><p>本地二维码识别；不上传相册图片或摄像头画面</p><a href="https://github.com/Sec-ant/zxing-wasm">github.com/Sec-ant/zxing-wasm</a><a class="notice-license-link" href="https://opensource.org/license/mit">查看许可 ↗</a></article><article class="notice-project"><h3>ZXing-C++ / ZXingWasm C++</h3><p>ZXing authors / Sec-ant · Apache-2.0</p><p>本地二维码识别；不上传相册图片或摄像头画面</p><a href="https://github.com/zxing-cpp/zxing-cpp">github.com/zxing-cpp/zxing-cpp</a><a class="notice-license-link" href="https://www.apache.org/licenses/LICENSE-2.0">查看许可 ↗</a></article><article class="notice-project"><h3>zint（解码器发行包附带声明）</h3><p>Zint authors · BSD-3-Clause</p><p>本地二维码识别；不上传相册图片或摄像头画面</p><a href="https://github.com/zint/zint">github.com/zint/zint</a><a class="notice-license-link" href="https://opensource.org/license/bsd-3-clause">查看许可 ↗</a></article><article class="notice-project"><h3>jsoup 1.23.2</h3><p>Jonathan Hedley · MIT</p><p>解析学校与学习通网页</p><a href="https://github.com/jhy/jsoup">github.com/jhy/jsoup</a><a class="notice-license-link" href="https://opensource.org/license/mit">查看许可 ↗</a></article><article class="notice-project"><h3>jsQR 1.4.0</h3><p>Cozmo / jsQR contributors · Apache-2.0</p><p>本机摄像头、相册二维码识别</p><a href="https://github.com/cozmo/jsQR">github.com/cozmo/jsQR</a><a class="notice-license-link" href="https://www.apache.org/licenses/LICENSE-2.0">查看许可 ↗</a></article></div><h2>当前功能与交互参考</h2><article class="notice-project"><h3>Classy</h3><p>IMSX3D · GPL-3.0</p><p>参考课表背景预览与内容分层的设计说明，禾序独立实现。</p><a href="https://github.com/IMSX3D/Classy/blob/main/docs/design/CUSTOM_BACKGROUND.md">设计说明 ↗</a><a class="notice-license-link" href="https://github.com/IMSX3D/Classy/blob/main/LICENSE">项目许可 ↗</a></article><article class="notice-project"><h3>Sleepy 课程表</h3><p>lingion · GPL-3.0</p><p>单次课程、调休、课表导出、上课设置和玻璃外观参考；本版独立实现，未复制或打包其源码</p><a href="https://github.com/lingion/sleepy">github.com/lingion/sleepy</a><a href="https://github.com/lingion/sleepy/blob/main/LICENSE">项目许可 ↗</a></article><p>以下项目用于公开协议、功能或设计思路参考，未引入其运行库或复制项目代码。life-798 登录适配亦感谢 YechoY 在 issue #32 的协议说明。</p><div class="notice-projects"><article class="notice-project"><h3>life-798</h3><p>nocookies111 · MIT</p><p>798 登录、接水与账单接口参考</p><a href="https://github.com/nocookies111/life-798">github.com/nocookies111/life-798</a><a class="notice-license-link" href="https://opensource.org/license/mit">查看许可 ↗</a></article><article class="notice-project"><h3>ocsjs</h3><p>ocsjs · MIT</p><p>学习通题型和表单字段参考</p><a href="https://github.com/ocsjs/ocsjs">github.com/ocsjs/ocsjs</a><a class="notice-license-link" href="https://opensource.org/license/mit">查看许可 ↗</a></article><article class="notice-project"><h3>yatori-go-core</h3><p>yatori-dev · MIT</p><p>学习通作业题型识别参考</p><a href="https://github.com/yatori-dev/yatori-go-core">github.com/yatori-dev/yatori-go-core</a><a class="notice-license-link" href="https://opensource.org/license/mit">查看许可 ↗</a></article><article class="notice-project"><h3>obsidian-chaoxing</h3><p>YukiHimeno · 未明确声明</p><p>学习通页面和提交字段参考</p><a href="https://github.com/YukiHimeno/obsidian-chaoxing">github.com/YukiHimeno/obsidian-chaoxing</a></article><article class="notice-project"><h3>onetake</h3><p>feitangyuan · PolyForm Noncommercial 1.0.0</p><p>界面与交互设计参考；未引入项目运行库</p><a href="https://github.com/feitangyuan/onetake">github.com/feitangyuan/onetake</a><a class="notice-license-link" href="https://github.com/feitangyuan/onetake/blob/main/LICENSE">查看许可 ↗</a></article><article class="notice-project"><h3>liquid-glass-react</h3><p>rdev · MIT</p><p>界面与交互设计参考；未引入项目运行库</p><a href="https://github.com/rdev/liquid-glass-react">github.com/rdev/liquid-glass-react</a><a class="notice-license-link" href="https://github.com/rdev/liquid-glass-react/blob/master/LICENSE">查看许可 ↗</a></article><article class="notice-project"><h3>liquid-glass</h3><p>shuding · MIT</p><p>界面与交互设计参考；未引入项目运行库</p><a href="https://github.com/shuding/liquid-glass">github.com/shuding/liquid-glass</a><a class="notice-license-link" href="https://github.com/shuding/liquid-glass/blob/main/LICENSE">查看许可 ↗</a></article><article class="notice-project"><h3>AndroidLiquidGlass</h3><p>Kyant0 · Apache-2.0</p><p>界面与交互设计参考；未引入项目运行库</p><a href="https://github.com/Kyant0/AndroidLiquidGlass">github.com/Kyant0/AndroidLiquidGlass</a><a class="notice-license-link" href="https://github.com/Kyant0/AndroidLiquidGlass/blob/kmp/LICENSE">查看许可 ↗</a></article></div><h2>随包许可文本</h2><p>许可链接便于查看原文；随包分发的组件版权与许可同时保留在本机，离线也可阅读。</p><details class="notice-license"><summary>zint-LICENSE.txt · 展开许可全文</summary><pre>
 </pre></details><details class="notice-license"><summary>zxing-cpp-LICENSE.txt · 展开许可全文</summary><pre>                                 Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/
@@ -1175,16 +1243,17 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 </pre></details><p>系统字体和 Android WebView 由设备提供。禾序的校园课表、交互及数据适配独立实现。</p></div></div>
-<div id="diag" class="hidden">
+<div id="diag" class="hidden settings-subpage">
   <div class="topbar">
-    <button id="diagBack">‹ 返回</button>
+    <button id="diagBack" type="button">‹ 我的</button>
     <div class="t">自检诊断</div>
-    <button id="diagRun">重跑</button>
+    <button id="diagRun" type="button">重查</button>
   </div>
-  <div class="elec-body">
+  <div class="elec-body settings-body diag-body">
     <div class="card">
-      <div class="lbl" id="diagVer">—</div>
-      <div id="diagList"><div class="lbl">点右上角「重跑」开始检查</div></div>
+      <div class="diag-overview"><div class="lbl" id="diagVer">—</div><p id="diagStatus" role="status"></p></div>
+      <div class="diag-progress" aria-hidden="true"></div>
+      <div id="diagList"></div>
     </div>
     <div class="card">
       <div class="lbl" style="line-height:1.9">
@@ -1228,6 +1297,9 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
    <div class="plan-widget-actions"><a href="jxau-pocket://schedule/widget"><span aria-hidden="true">▤</span> 今日安排</a><a href="jxau-pocket://schedule/next-widget"><span aria-hidden="true">◷</span> 下一项安排</a></div>
    <p class="plan-widget-hint">点击后按系统提示添加。若未弹窗，长按桌面空白处，在「小组件」里找到「禾序」。</p>
   </section>
+  <button id="planScheduleBackground" class="plan-background-entry" type="button">
+   <span class="ic" data-icon="image" aria-hidden="true"></span><span><b>课表背景</b><small>预览并调整背景图片</small></span><span aria-hidden="true">›</span>
+  </button>
   <div class="plan-tabs" role="tablist" aria-label="课表工具"><span class="plan-tab-indicator" aria-hidden="true"></span><button id="planTabTransfer" type="button" role="tab" aria-controls="planTransferView" data-plan-tab="transfer">调课补课</button><button id="planTabExport" type="button" role="tab" aria-controls="planExportView" data-plan-tab="export">分享导出</button><button id="planTabChanges" type="button" role="tab" aria-controls="planChangesView" data-plan-tab="changes">修改记录</button></div>
   <div class="plan-tab-stage">
    <div id="planTransferView" class="plan-tool-view" role="tabpanel" aria-labelledby="planTabTransfer">
@@ -1279,6 +1351,7 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 <script src="js/support.js"></script>
 <script src="js/route-motion.js"></script>
 <script src="js/calendar.js"></script>
+<script src="js/schedule-background.js"></script>
 <script src="js/planner.js"></script>
 <script src="js/class-mode.js"></script>
 <script src="js/glass-optics.js"></script>

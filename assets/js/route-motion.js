@@ -2,8 +2,8 @@
  'use strict';
  const $=id=>document.getElementById(id);
  const main=new Set(['today','schedule','chaoxing','waterDevice','settings']);
- const secondary=new Set(['grades','parcels','appearanceSettings','schedulePreferences','classAliases','classAliasEditor','usageGuide','feedback','notices','diag','elec','integrations','library','bookDetail','cxWork','waterSpendingDetail']);
- const parents={appearanceSettings:'settings',schedulePreferences:'settings',classAliases:'schedulePreferences',classAliasEditor:'classAliases',feedback:'settings',notices:'settings',diag:'settings',bookDetail:'library',cxWork:'chaoxing',waterSpendingDetail:'waterDevice'};
+ const secondary=new Set(['grades','parcels','appearanceSettings','schedulePreferences','scheduleBackground','classAliases','classAliasEditor','usageGuide','feedback','appUpdate','notices','diag','elec','integrations','library','bookDetail','cxWork','waterSpendingDetail']);
+ const parents={appearanceSettings:'settings',schedulePreferences:'settings',scheduleBackground:'schedule',classAliases:'schedulePreferences',classAliasEditor:'classAliases',feedback:'settings',appUpdate:'settings',notices:'settings',diag:'settings',bookDetail:'library',cxWork:'chaoxing',waterSpendingDetail:'waterDevice'};
  const scrolls=new Map(),origins=new Map();let pending=null,capture=null,incoming=null,returnNav=null,animations=[],generation=0,liveOutgoing=null;
  const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
  function cleanup(){
@@ -41,7 +41,7 @@
     dest.style.setProperty('animation','none','important');dest.style.setProperty('transition','none','important');
     if(el.id)dest.dataset.routeSnapshotId=el.id;
     dest.removeAttribute('id');
-    if(el instanceof HTMLInputElement){dest.value=el.value;dest.checked=el.checked;}
+    if(el instanceof HTMLInputElement){if(el.type!=='file')dest.value=el.value;dest.checked=el.checked;}
     if(el instanceof HTMLTextAreaElement||el instanceof HTMLSelectElement)dest.value=el.value;
     for(const pseudo of ['::before','::after']){
      const ps=getComputedStyle(el,pseudo);

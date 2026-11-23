@@ -7,11 +7,11 @@ def run(args):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--code', type=int, default=131)
-    parser.add_argument('--version', default='3.4.97')
+    parser.add_argument('--code', type=int, default=136)
+    parser.add_argument('--version', default='3.5.11')
     parser.add_argument('--sdk', default=os.getenv('ANDROID_SDK_ROOT', 'D:/android-build/sdk'))
     parser.add_argument('--jdk', default=os.getenv('JAVA_HOME', 'D:/android-build/jdk-21.0.2'))
-    parser.add_argument('--name', default='Hexu-v3.4.97.apk')
+    parser.add_argument('--name', default='Hexu-v3.5.11.apk')
     parser.add_argument('--debug', action='store_true')
     args = parser.parse_args()
     sdk, jdk = pathlib.Path(args.sdk), pathlib.Path(args.jdk)

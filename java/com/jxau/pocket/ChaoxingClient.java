@@ -16,13 +16,49 @@ public class ChaoxingClient {
     private static final String LOGIN="https://passport2.chaoxing.com";
     private static final String MOOC="https://mooc1.chaoxing.com";
     private static final String API="https://mooc1-api.chaoxing.com";
+    private static final int BATCH_SIZE=12;
+    private static final long LIMIT_PAUSE=180_000L;
+    private static final String LIMIT_KEY="chaoxing-read-cooldown";
     private final SecureStore store;
     private final CookieManager cookies=new CookieManager(null,CookiePolicy.ACCEPT_ORIGINAL_SERVER);
     protected String lastUrl="";
     public ChaoxingClient(SecureStore s){store=s;}
     private JSONObject session() throws Exception { JSONObject s=store.get("chaoxing"); if(s==null||s.optString("user").isEmpty()) throw new Exception("还没有绑定学习通账号"); return s; }
     private static String enc(String s)throws Exception{return URLEncoder.encode(s==null?"":s,"UTF-8");}
+    static final class ScanPause extends IOException {
+        final long retryAt;
+        ScanPause(long retryAt) {
+            super("学习通暂时限制访问，已暂停读取");
+            this.retryAt=retryAt;
+        }
+    }
+    static final class CourseDenied extends IOException {
+        CourseDenied() { super("学习通拒绝读取此课程，请到学习通核对课程权限"); }
+    }
+    private static long retryAt(String retryAfter,long now) {
+        long until=now+LIMIT_PAUSE;
+        if(retryAfter==null)return until;
+        try{
+            long seconds=Long.parseLong(retryAfter.trim());
+            if(seconds>0)until=Math.max(until,now+Math.min(seconds,31536000L)*1000);
+        }catch(NumberFormatException ignored){
+            java.text.SimpleDateFormat format=new java.text.SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz",Locale.US);
+            format.setLenient(false);
+            Date date=format.parse(retryAfter,new java.text.ParsePosition(0));
+            if(date!=null)until=Math.max(until,date.getTime());
+        }
+        return until;
+    }
+    private long cooldown()throws Exception {
+        JSONObject paused=store.get(LIMIT_KEY);
+        return paused==null?0:paused.optLong("until");
+    }
+    private void requireCooldownElapsed()throws Exception {
+        long until=cooldown();
+        if(until>System.currentTimeMillis())throw new ScanPause(until);
+    }
     protected String req(String url,String method,String body,String referer,boolean follow)throws Exception{
+        requireCooldownElapsed();
         for(int hop=0;hop<9;hop++){
             if(!ChaoxingParser.trusted(url))throw new Exception("学习通返回了不支持的跳转地址");
             HttpURLConnection c=(HttpURLConnection)new URL(url).openConnection();
@@ -38,7 +74,12 @@ public class ChaoxingClient {
                 for(Map.Entry<String,List<String>> en:c.getHeaderFields().entrySet())if("set-cookie".equalsIgnoreCase(en.getKey()))for(String v:en.getValue())for(HttpCookie ck:HttpCookie.parse(v)){if(ck.getDomain()==null)ck.setDomain(u.getHost());if(CookiePolicy.ACCEPT_ORIGINAL_SERVER.shouldAccept(u,ck))cookies.getCookieStore().add(u,ck);}
                 if(code>=300&&code<400&&follow){String loc=c.getHeaderField("Location");if(loc==null)throw new Exception("学习通跳转未返回目标");URI next=u.resolve(loc);if(body!=null&&(code==307||code==308)&&!u.getAuthority().equals(next.getAuthority()))throw new Exception("已阻止学习通提交数据跨站跳转");url=next.toString();if(code==303||code==301||code==302){method="GET";body=null;}continue;}
                 if(code==401)throw new Exception("学习通登录已失效，请重新绑定");
-                if(code==202||code==429)throw new Exception("学习通暂时限制访问，请过几分钟再检查");
+                if(code==202||code==429){
+                    long until=retryAt(c.getHeaderField("Retry-After"),System.currentTimeMillis());
+                    store.put(LIMIT_KEY,new JSONObject().put("until",until));
+                    throw new ScanPause(until);
+                }
+                if(code==403)throw new CourseDenied();
                 if(code!=200)throw new Exception("学习通返回 HTTP "+code+"，请稍后重试");
                 try(InputStream in=c.getInputStream();ByteArrayOutputStream out=new ByteArrayOutputStream()){
                     byte[] bytes=new byte[8192];int n;while((n=in.read(bytes))>0){if(out.size()+n>4*1024*1024)throw new IOException("学习通响应过大");out.write(bytes,0,n);}
@@ -85,10 +126,48 @@ public class ChaoxingClient {
         store.put("chaoxing-cookies",new JSONObject().put("cookies",arr));
     }
     public synchronized JSONObject scan()throws Exception{
-        if(scanning)return snapshot();ensureSession();scanning=true;
-        JSONObject previous=latest==null?store.get("chaoxing-todo"):latest;
-        progress=previous==null?new JSONObject():new JSONObject(previous.toString());progress.put("ok",true).put("scanning",true).put("completed",0).put("courses",0).put("course","");
-        Thread t=new Thread(()->{try{publish(readAll());saveCookies();}catch(Exception e){try{progress=new JSONObject().put("ok",false).put("msg",e.getMessage()==null?"学习通读取失败":e.getMessage());}catch(Exception ignored){}}finally{scanning=false;}},"jxau-chaoxing-scan");t.setDaemon(true);t.start();return snapshot();
+        if(scanning||cooldown()>System.currentTimeMillis())return snapshot();
+        ensureSession();
+        JSONObject initial=snapshot();
+        initial.put("scanning",true).put("course","").remove("warning");
+        if(!initial.optBoolean("manualResume")){
+            JSONArray catalog=initial.optJSONArray("courseCatalog");
+            if(catalog!=null)for(int i=0;i<catalog.length();i++){
+                JSONObject course=catalog.getJSONObject(i);
+                course.put("state","pending").remove("message");
+            }
+            initial.put("completed",0).put("failed",new JSONArray());
+        }
+        progress=initial;
+        scanning=true;
+        Thread worker=new Thread(()->{
+            try{
+                publish(readBatch());
+                saveCookies();
+            }catch(Exception e){
+                try{
+                    JSONObject partial=new JSONObject(progress.toString()).put("scanning",false);
+                    if(e instanceof ScanPause){
+                        long until=((ScanPause)e).retryAt;
+                        store.put(LIMIT_KEY,new JSONObject().put("until",until));
+                        partial.put("retryAt",until);
+                    }
+                    partial.put("warning",e.getMessage()==null?"学习通读取失败":e.getMessage());
+                    partial.put("manualResume",true);
+                    publish(partial);
+                }catch(Exception ignored){
+                    // The prior saved list still remains available if storage fails.
+                }
+            }finally{
+                synchronized(ChaoxingClient.this){
+                    progress=null;
+                    scanning=false;
+                }
+            }
+        },"jxau-chaoxing-scan");
+        worker.setDaemon(true);
+        worker.start();
+        return snapshot();
     }
     private synchronized void publish(JSONObject list)throws Exception{
         reconcile(list);latest=list;store.put("chaoxing-todo",list);
@@ -107,47 +186,139 @@ public class ChaoxingClient {
         }
     }
     public JSONObject snapshot()throws Exception{
-        JSONObject p=progress;
-        if(scanning){JSONObject result=p==null?new JSONObject().put("ok",true).put("scanning",true):new JSONObject(p.toString());reconcile(result);return result;}
-        if(p!=null&&!p.optBoolean("ok",true))return p;
-        JSONObject data=latest;if(data==null)data=store.get("chaoxing-todo");
-        if(data==null)return new JSONObject().put("ok",true).put("items",new JSONArray()).put("checkedAt",0).put("courses",0);
-        JSONObject result=new JSONObject(data.toString());reconcile(result);return result.put("scanning",false);
+        JSONObject active=progress;
+        JSONObject data=active!=null?active:latest;
+        if(data==null)data=store.get("chaoxing-todo");
+        JSONObject result=data==null?new JSONObject().put("ok",true).put("items",new JSONArray())
+                .put("checkedAt",0).put("courses",0):new JSONObject(data.toString());
+        reconcile(result);
+        result.put("scanning",scanning && active!=null);
+        long until=cooldown();
+        if(until>System.currentTimeMillis())result.put("retryAt",until);
+        else result.remove("retryAt");
+        return result;
     }
     private synchronized JSONArray readCourse(JSONObject c)throws Exception{
         String title=c.optString("title");JSONObject mm=meta(c);
         if(mm.optString("stuenc").isEmpty()||mm.optString("workEnc").isEmpty())throw new Exception("未取得作业入口");
+        Thread.sleep(650);
         String url=MOOC+"/mooc2/work/list?courseId="+c.optString("courseId")+"&classId="+c.optString("classId")+"&cpi="+c.optString("cpi")+"&ut=s&t="+System.currentTimeMillis()+"&stuenc="+mm.optString("stuenc")+"&enc="+mm.optString("workEnc");
         String html=req(url,"GET",null,mm.optString("referer"),true);
-        if(html.contains("无权限的操作")||html.contains("无效的用户"))throw new Exception("学习通拒绝读取，请重新绑定后再检查");
+        if(html.contains("无权限的操作")||html.contains("无效的用户"))throw new CourseDenied();
         if(lastUrl.startsWith(LOGIN)||html.contains("passport2.chaoxing.com/login"))throw new Exception("学习通登录已失效，请重新绑定");
         JSONArray rows=ChaoxingParser.works(html,lastUrl,title,System.currentTimeMillis());
         for(int n=0;n<rows.length();n++)rows.getJSONObject(n).put("courseKey",c.optString("courseId")+":"+c.optString("classId"));return rows;
     }
-    private synchronized void publishProgress(JSONArray fresh,JSONArray previous,JSONArray catalog,Set<String> read,Set<String> readTitles,JSONArray failed,int completed,String title)throws Exception{
-        JSONArray merged=new JSONArray(fresh.toString());
-        for(int n=0;n<previous.length();n++){
-            JSONObject row=previous.getJSONObject(n);String key=row.optString("courseKey");
-            if(key.isEmpty()?!readTitles.contains(row.optString("course")):!read.contains(key))merged.put(new JSONObject(row.toString()).put("cached",true));
+    private synchronized void publishProgress(JSONArray items,JSONArray catalog,JSONArray failed,
+                                               int completed,String title)throws Exception{
+        Set<String> readKeys=new HashSet<>(),readTitles=new HashSet<>();
+        for(int i=0;i<catalog.length();i++){
+            JSONObject course=catalog.getJSONObject(i);
+            if("done".equals(course.optString("state"))){
+                readKeys.add(course.optString("key"));
+                readTitles.add(course.optString("title"));
+            }
         }
-        JSONObject list=new JSONObject().put("ok",true).put("scanning",true).put("completed",completed).put("courses",catalog.length()).put("course",title).put("courseCatalog",new JSONArray(catalog.toString())).put("items",merged).put("failed",new JSONArray(failed.toString())).put("checkedAt",0);
-        reconcile(list);latest=new JSONObject(list.toString());progress=list;
+        JSONArray merged=new JSONArray();
+        for(int i=0;i<items.length();i++){
+            JSONObject item=new JSONObject(items.getJSONObject(i).toString());
+            String key=item.optString("courseKey");
+            if(key.isEmpty()?readTitles.contains(item.optString("course")):readKeys.contains(key))item.remove("cached");
+            else item.put("cached",true);
+            merged.put(item);
+        }
+        JSONObject list=new JSONObject().put("ok",true).put("scanning",true)
+                .put("completed",completed).put("courses",catalog.length()).put("course",title)
+                .put("courseCatalog",catalog).put("items",merged).put("failed",failed);
+        reconcile(list);
+        progress=new JSONObject(list.toString());
+        latest=progress;
     }
-    private JSONObject readAll()throws Exception{
-        JSONArray cs=courses(),items=new JSONArray(),failed=new JSONArray(),catalog=new JSONArray();Set<String> read=new HashSet<>(),readTitles=new HashSet<>();
-        JSONObject old=latest==null?store.get("chaoxing-todo"):latest;JSONArray previous=old==null?null:old.optJSONArray("items");if(previous==null)previous=new JSONArray();
-        for(int i=0;i<cs.length();i++){JSONObject c=cs.getJSONObject(i);catalog.put(new JSONObject().put("key",c.optString("courseId")+":"+c.optString("classId")).put("title",c.optString("title")).put("state","pending"));}
-        publishProgress(items,previous,catalog,read,readTitles,failed,0,"");
-        for(int i=0;i<cs.length();i++){
-            JSONObject c=cs.getJSONObject(i);String title=c.optString("title"),key=c.optString("courseId")+":"+c.optString("classId");
-            publishProgress(items,previous,catalog,read,readTitles,failed,i,title);Exception fatal=null;
-            try{JSONArray rows=readCourse(c);for(int n=0;n<rows.length();n++)items.put(rows.get(n));read.add(key);readTitles.add(title);catalog.getJSONObject(i).put("state","done");}
-            catch(Exception e){catalog.getJSONObject(i).put("state","failed");failed.put(new JSONObject().put("course",title).put("message",e.getMessage()));if(e.getMessage()!=null&&(e.getMessage().contains("限制访问")||e.getMessage().contains("登录已失效")))fatal=e;}
-            publishProgress(items,previous,catalog,read,readTitles,failed,i+1,title);
-            if(fatal!=null)throw fatal;
-            if(i+1<cs.length())Thread.sleep(900);
+
+    private static String courseKey(JSONObject course){
+        return course.optString("courseId")+":"+course.optString("classId");
+    }
+
+    private JSONObject readBatch()throws Exception{
+        JSONObject before=progress;
+        JSONArray previousCatalog=before.optJSONArray("courseCatalog");
+        Map<String,JSONObject> oldStates=new HashMap<>();
+        boolean resume=before.optBoolean("manualResume")&&previousCatalog!=null;
+        if(resume){
+            for(int i=0;i<previousCatalog.length();i++){
+                JSONObject old=previousCatalog.getJSONObject(i);
+                if(!"pending".equals(old.optString("state")))oldStates.put(old.optString("key"),old);
+            }
         }
-        JSONObject result=new JSONObject(progress.toString());return result.put("scanning",false).put("checkedAt",System.currentTimeMillis()).put("warning",failed.length()>0?failed.length()+" 门课程未能完整读取，保留这些课程上次的记录":"");
+        JSONArray oldItems=before.optJSONArray("items");
+        JSONArray items=oldItems==null?new JSONArray():new JSONArray(oldItems.toString());
+        Map<String,JSONObject> coursesByKey=new LinkedHashMap<>();
+        JSONArray available=courses();
+        for(int i=0;i<available.length();i++){
+            JSONObject course=available.getJSONObject(i);
+            coursesByKey.putIfAbsent(courseKey(course),course);
+        }
+        JSONArray catalog=new JSONArray(),failed=new JSONArray();
+        int completed=0;
+        for(Map.Entry<String,JSONObject> entry:coursesByKey.entrySet()){
+            JSONObject old=oldStates.get(entry.getKey());
+            JSONObject course=new JSONObject().put("key",entry.getKey())
+                    .put("title",entry.getValue().optString("title")).put("state","pending");
+            if(old!=null){
+                String state=old.optString("state");
+                course.put("state",state);
+                if("failed".equals(state))addFailure(course,failed,old.optString("message"));
+                completed++;
+            }
+            catalog.put(course);
+        }
+        publishProgress(items,catalog,failed,completed,"");
+
+        int attempted=0;
+        for(int i=0;i<catalog.length()&&attempted<BATCH_SIZE;i++){
+            JSONObject course=catalog.getJSONObject(i);
+            if(!"pending".equals(course.optString("state")))continue;
+            if(attempted++>0)Thread.sleep(1600);
+            String key=course.optString("key"),title=course.optString("title");
+            publishProgress(items,catalog,failed,completed,title);
+            try{
+                JSONArray rows=readCourse(coursesByKey.get(key));
+                JSONArray merged=new JSONArray();
+                for(int n=0;n<rows.length();n++)merged.put(rows.get(n));
+                for(int n=0;n<items.length();n++){
+                    JSONObject item=items.getJSONObject(n);
+                    String oldKey=item.optString("courseKey");
+                    if(oldKey.isEmpty()?!title.equals(item.optString("course")):!key.equals(oldKey))
+                        merged.put(item);
+                }
+                items=merged;
+                course.put("state","done");
+            }catch(ScanPause e){
+                throw e;
+            }catch(Exception e){
+                String message=e.getMessage();
+                if(message!=null&&message.contains("登录已失效"))throw e;
+                if(e instanceof IOException && !(e instanceof CourseDenied)){
+                    throw new IOException("网络连接中断，本次检查已暂停；可手动继续。",e);
+                }
+                addFailure(course,failed,message==null?"这门课程暂时无法读取":message);
+                if(e instanceof CourseDenied){
+                    publishProgress(items,catalog,failed,++completed,title);
+                    throw new IOException("学习通拒绝读取此课程，本次检查已暂停；可手动继续其他课程。");
+                }
+            }
+            publishProgress(items,catalog,failed,++completed,title);
+        }
+
+        boolean more=completed<catalog.length();
+        JSONObject result=new JSONObject(progress.toString()).put("scanning",false)
+                .put("manualResume",more).put("course","").put("checkedAt",System.currentTimeMillis());
+        if(more)return result.put("warning","已读取一批课程，点击继续检查可从剩余课程开始");
+        return result.put("warning",failed.length()>0?failed.length()+" 门课程未完整读取，已保留这些课程的旧记录":"");
+    }
+    private static void addFailure(JSONObject course,JSONArray failed,String message)throws Exception{
+        course.put("state","failed").put("message",message);
+        failed.put(new JSONObject().put("course",course.optString("title")).put("message",message));
     }
 
     static final class WorkSession {

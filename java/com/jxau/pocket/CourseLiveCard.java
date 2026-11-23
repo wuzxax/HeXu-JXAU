@@ -131,6 +131,8 @@ final class CourseLiveCard {
         cancel(c, SERVICE_ID);
     }
 
+    static void cancelUnhosted(Context c) { cancel(c, ID); }
+
     static void cancel(Context c, int id) {
         NotificationManager manager = manager(c);
         if (VivoCourseCard.supportsDevice()) manager.cancel(VivoCourseCard.TAG, id);
@@ -148,11 +150,13 @@ final class CourseLiveCard {
         String right = CourseLabel.room(event.optString("room"), density);
         boolean hosted = (VivoCourseCard.supportsDevice() && Build.VERSION.SDK_INT >= 34)
                 || ColorOsCourseCard.supported();
-        if (hosted && CourseCardService.request(c, title, text, left, right, start, end, deadline, phase)) {
-            if (current(c, ID) != null) cancel(c, ID);
-            return;
-        }
+        if (hosted && CourseCardService.request(c, title, text, left, right, start, end, deadline, phase)) return;
         if (hosted) stopHosting(c);
+        postNotification(c, title, text, left, right, start, end, deadline, now, phase);
+    }
+
+    static void postNotification(Context c, String title, String text, String left, String right, long start,
+                                 long end, long deadline, long now, String phase) {
         Notification notification = build(c, title, text, left, right, start, end, deadline, now, phase, ID);
         if (notification != null) manager(c).notify(ID, notification);
     }

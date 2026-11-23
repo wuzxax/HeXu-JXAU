@@ -5,11 +5,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 final class Http {
     static String call(String url, String method, String body, Map<String,String> headers) throws Exception {
+        return call(url, method, body, headers, 12000, 20000);
+    }
+
+    static String call(String url, String method, String body, Map<String,String> headers,
+                       int connectTimeout, int readTimeout) throws Exception {
         URL target=new URL(url);
         if(!"https".equals(target.getProtocol())||target.getUserInfo()!=null)throw new IOException("已阻止不安全的接口连接");
         HttpURLConnection c=(HttpURLConnection)target.openConnection();
         c.setInstanceFollowRedirects(false);
-        c.setRequestMethod(method);c.setConnectTimeout(12000);c.setReadTimeout(20000);
+        c.setRequestMethod(method);c.setConnectTimeout(connectTimeout);c.setReadTimeout(readTimeout);
         c.setRequestProperty("User-Agent",CasClient.UA);
         if(headers!=null)for(Map.Entry<String,String> e:headers.entrySet())c.setRequestProperty(e.getKey(),e.getValue());
         try {

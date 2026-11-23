@@ -1344,8 +1344,8 @@
   // ---------------- 自检诊断 ----------------
   function diagRow(name, ok, detail){
     const status = ok === null ? 'pending' : (ok ? 'ok' : 'error');
-    const label = ok === null ? '未检查' : (ok ? '通过' : '未通过');
-    const mark = ok === null ? '…' : (ok ? '✓' : '✗');
+    const label = ok === null ? '已跳过' : (ok ? '通过' : '未通过');
+    const mark = ok === null ? '–' : (ok ? '✓' : '✗');
     return '<div class="diag-row">' +
       '<span class="diag-mark" data-status="' + status + '" role="img" aria-label="' + label + '">' + mark + '</span>' +
       '<div class="diag-result"><div class="diag-name">' + esc(name) + '</div>' +
@@ -1353,50 +1353,99 @@
   }
 
   async function runDiag(){
-    const box = $('diagList');
-    const ver = $('diagVer');
-    if(ver) ver.textContent = '版本 ' + (window.__VER__ || '—') + ' · 构建于 ' + (window.__BUILD__ || '—');
+    if (diagController) return;
+    const controller = new AbortController();
+    diagController = controller;
+    const box = $('diagList'), run = $('diagRun'), status = $('diagStatus');
+    $('diagVer').textContent = '版本 ' + (window.__VER__ || '—') + ' · 构建于 ' + (window.__BUILD__ || '—');
 
-    const rows = [];
-    function render(){
-      box.innerHTML = rows.map(r => diagRow(r.name, r.ok, r.detail)).join('');
+    const rows = new Map([...box.children].map(el => [el.querySelector('.diag-name').textContent, el]));
+    const reported = new Set();
+    let bad = 0;
+    const request = path => j(path, {signal: controller.signal});
+    function add(name, ok, detail){
+      if (controller.signal.aborted) return;
+      if (ok === false) bad++;
+      reported.add(name);
+      const existing = rows.get(name);
+      if (existing) {
+        const mark = existing.querySelector('.diag-mark');
+        mark.dataset.status = ok === null ? 'pending' : ok ? 'ok' : 'error';
+        mark.setAttribute('aria-label', ok === null ? '已跳过' : ok ? '通过' : '未通过');
+        mark.textContent = ok === null ? '–' : ok ? '✓' : '✗';
+        existing.querySelector('.diag-detail').textContent = detail || '';
+      } else {
+        const summary = rows.get('总结');
+        const html = diagRow(name, ok, detail);
+        if (summary) summary.insertAdjacentHTML('beforebegin', html);
+        else box.insertAdjacentHTML('beforeend', html);
+        const row = summary ? summary.previousElementSibling : box.lastElementChild;
+        if (name === '总结') row.classList.add('diag-summary');
+        if (!matchMedia('(prefers-reduced-motion: reduce)').matches && row.animate) {
+          row.animate([{opacity:0,transform:'translateY(5px)'},{opacity:1,transform:'none'}],
+            {duration:290,easing:'cubic-bezier(.22,.72,.28,1)'});
+        }
+      }
     }
-    function add(name, ok, detail){ rows.push({name:name, ok:ok, detail:detail}); render(); }
 
-    rows.length = 0;
-    box.innerHTML = '<div class="lbl">检查中…</div>';
+    run.disabled = true;
+    $('diag').dataset.checking = 'true';
+    box.setAttribute('aria-busy', 'true');
+    status.textContent = '正在检查连接和本机数据…';
+    try {
+      await checkDiagnostics(request, add, controller.signal);
+      if (controller.signal.aborted) return;
+      for (const [name, row] of rows) if (!reported.has(name)) row.remove();
+      add('总结', bad === 0, bad === 0 ? '已检查项目通过；未绑定与待接入项目不计入通过项' : (bad + ' 项未通过，见上面标红项'));
+      status.textContent = bad ? '检查完成 · ' + bad + ' 项需查看' : '检查完成';
+    } catch (e) {
+      if (!controller.signal.aborted) status.textContent = '检查未完成，请重试。';
+    } finally {
+      if (diagController === controller) stopDiag();
+    }
+  }
 
+  let diagController;
+  function stopDiag(){
+    diagController?.abort();
+    diagController = undefined;
+    $('diagRun').disabled = false;
+    $('diagList').removeAttribute('aria-busy');
+    delete $('diag').dataset.checking;
+  }
+
+  async function checkDiagnostics(request, add, signal){
     // 1. 门户登录态
     let loggedIn = false;
     try{
-      const st = await j('/api/status');
+      const st = await request('/api/status');
       loggedIn = !!st.logged_in;
       add('门户登录态', loggedIn, loggedIn ? ('已登录：' + (st.user || '')) : '未登录，请先在「我的」里重新登录');
     }catch(e){ add('门户登录态', false, '请求失败：' + e); }
-    render();
 
+    if (signal.aborted) return;
     if(loggedIn){
       try{
-        const result=await j('/api/week?n=0');
+        const result=await request('/api/week?n=0');
         const data=result.data||{};
         add('课表读取',!!result.ok,result.ok?('第 '+data.week+' 周 · 来源 '+(data.source==='jwgl'?'教务':data.source==='portal'?'门户':'学校')+(data.warning?' · '+data.warning:'')):(result.msg||'读取失败'));
       }catch(e){add('课表读取',false,'请求失败：'+e.message);}
     }
 
+    if (signal.aborted) return;
     // 2. 图书馆会话
-    let libOk = false;
     try{
-      const info = await j('/api/lib/info');
-      libOk = !!info.ok;
-        add('图书馆会话', libOk, libOk ? '读者信息接口已连通' : (info.msg || '未连通'));
+      const info = await request('/api/lib/info');
+      const libOk = !!info.ok;
+      add('图书馆会话', libOk, libOk ? '读者信息接口已连通' : (info.msg || '未连通'));
     }catch(e){ add('图书馆会话', false, '请求失败：' + e); }
-    render();
 
+    if (signal.aborted) return;
     // 3. 批量封面接口（先搜一本书拿 recordId）
     let testRid = '';
     let srList = [];
     try{
-      const sr = await j('/api/lib/search?q=' + encodeURIComponent('三体'));
+      const sr = await request('/api/lib/search?q=' + encodeURIComponent('三体'));
       if(sr && sr.ok && sr.list && sr.list.length){
         srList = sr.list;
         testRid = sr.list[0].recordId || '';
@@ -1405,27 +1454,27 @@
         add('书目检索', false, sr.msg || '没有搜到结果');
       }
     }catch(e){ add('书目检索', false, '请求失败：' + e); }
-    render();
 
+    if (signal.aborted) return;
     // 封面覆盖率：本页 20 本里有多少本图书馆给了封面图
     if(srList.length){
       const sids = srList.map(function(x){ return x.recordId; }).filter(Boolean).slice(0, 20);
       let got = 0;
       try{
-        const cv = await j('/api/lib/covers?ids=' + encodeURIComponent(sids.join(',')));
+        const cv = await request('/api/lib/covers?ids=' + encodeURIComponent(sids.join(',')));
         if(cv && cv.ok && cv.map){
           sids.forEach(function(id){ if(cv.map[id] && cv.map[id].url) got++; });
         }
         const pct = sids.length ? Math.round(got * 100 / sids.length) : 0;
         add('封面覆盖率', got > 0 ? true : null, '本页 ' + sids.length + ' 本，' + got + ' 本有封面（' + pct + '%）；未给封面的书将显示书名占位');
       }catch(e){ add('封面覆盖率', false, '请求失败：' + e); }
-      render();
     }
 
+    if (signal.aborted) return;
     let coverUrl = '';
     if(testRid){
       try{
-        const cv = await j('/api/lib/covers?ids=' + encodeURIComponent(testRid));
+        const cv = await request('/api/lib/covers?ids=' + encodeURIComponent(testRid));
         if(cv && cv.ok && cv.map && cv.map[testRid]){
           add('批量封面接口', true,
             '已读取在架 '+(cv.map[testRid].onShelf||0)+' 册；批量图片可能按书名模糊匹配，实际封面使用ISBN单查');
@@ -1433,26 +1482,36 @@
           add('批量封面接口', false, cv.msg || '返回为空');
         }
       }catch(e){ add('批量封面接口', false, '请求失败：' + e); }
-      render();
+      if (signal.aborted) return;
       try{
         const sample=srList.find(x=>String(x.recordId)===String(testRid));
         coverUrl=sample?await exactCover(sample.isbn,sample.title,testRid):'';
         add('ISBN精确封面',coverUrl?true:null,coverUrl?'已按本书ISBN取得封面':'未返回该ISBN的封面，显示书名占位');
       }catch(e){add('ISBN精确封面',false,'查询失败：'+e.message);}
-      render();
     }
 
+    if (signal.aborted) return;
     // 4. 分别检测WebView直连与本地代理，帮助手机端定位封面故障。
     if(coverUrl){
       const direct = await new Promise(resolve=>{
         const image=new Image();let done=false;
-        const finish=value=>{if(done)return;done=true;clearTimeout(timer);image.onload=image.onerror=null;resolve(value);};
+        const abort=()=>finish(false);
+        const finish=value=>{
+          if(done)return;
+          done=true;
+          clearTimeout(timer);
+          signal.removeEventListener('abort',abort);
+          image.onload=image.onerror=null;
+          resolve(value);
+        };
+        signal.addEventListener('abort',abort,{once:true});
         const timer=setTimeout(()=>finish(false),8000);
         image.onload=()=>finish(image.naturalWidth>0);image.onerror=()=>finish(false);image.src=coverUrl;
       });
+      if (signal.aborted) return;
       add('封面直连',direct?true:null,direct?'WebView可直接加载图片':'WebView直连未成功，继续检查本地代理');
       try{
-        const r = await fetch('/api/lib/img?u=' + encodeURIComponent(coverUrl));
+        const r = await fetch('/api/lib/img?u=' + encodeURIComponent(coverUrl), {signal});
         const blob = await r.blob();
         const size = blob.size;
         const valid=r.ok&&blob.type.indexOf('image/')===0&&size>0;
@@ -1462,41 +1521,38 @@
     }else{
       add('图片代理', null, '上一项没拿到图片地址，跳过');
     }
-    render();
 
+    if (signal.aborted) return;
     // 5. 电费
     try{
       loadElecCfg();
       if(elecCfg && elecCfg.roomId){
-        const es = await j('/api/elec/summary?roomId=' + encodeURIComponent(elecCfg.roomId) +
+        const es = await request('/api/elec/summary?roomId=' + encodeURIComponent(elecCfg.roomId) +
           '&userId=' + encodeURIComponent(elecCfg.userId));
         add('空调电费接口', !!(es && es.ok), (es && es.ok) ? ('余额 ' + es.balance + ' 元') : (es.msg || '未连通'));
       }else{
         add('空调电费接口', null, '还没绑定电费账号');
       }
     }catch(e){ add('空调电费接口', false, '请求失败：' + e); }
-    render();
 
+    if (signal.aborted) return;
     // 6. 本地数据
     const cached = !!(cacheKey()&&localStorage.getItem(cacheKey()));
     add('课表缓存', cached, cached ? '本地已有课表缓存' : '没有缓存，需要联网加载一次');
     add('本机凭证保护', !localStorage.getItem('cred')&&!localStorage.getItem('elec'), secureData.cred?'登录凭证已迁移到本机加密存储':'未保存登录密码');
-    render();
 
     try{
-      const st=await j('/api/life798/status');
-      if(st.bound){const value=await j('/api/life798/wallet?eid=');add('798钱包',!!value.ok,value.ok?((value.cached?'缓存余额 ':'余额 ')+value.balance+' 元 · 数据截至 '+new Date(value.updatedAt).toLocaleString()):(value.msg||'需要重新绑定'));}
-      else add('798钱包',null,'未绑定，可在「服务 → 798钱包」用本人手机号和验证码绑定');
+      const st=await request('/api/life798/status');
+      if(st.bound){const value=await request('/api/life798/wallet?eid=');add('798钱包',!!value.ok,value.ok?((value.cached?'缓存余额 ':'余额 ')+value.balance+' 元 · 数据截至 '+new Date(value.updatedAt).toLocaleString()):(value.msg||'需要重新绑定'));}
+      else add('798钱包',null,'未绑定，可在「接水 → 账号与钱包管理」用本人手机号和验证码绑定');
     }catch(e){add('798钱包',false,'连接失败：'+e.message);}
-    add('照明电费',null,'已暂停开放；本次诊断不触发照明授权或查询');
-    const bad = rows.filter(r => r.ok === false).length;
-    add('总结', bad === 0, bad === 0 ? '已检查项目通过；未绑定与待接入项目不计入通过项' : (bad + ' 项未通过，见上面标红项'));
-    render();
+    add('照明电费',null,'暂未接入，缴费可前往完美校园');
+
   }
 
   // ---------------- 导航绑定 ----------------
   function bindMainNav(){
-    Array.prototype.forEach.call(document.querySelectorAll('.main-tab'), function(b){
+    Array.prototype.forEach.call(document.querySelectorAll('#mainTabbar .main-tab'), function(b){
       b.addEventListener('click', function(){ switchMainTab(b.dataset.tab); });
     });
 
@@ -1534,7 +1590,7 @@
     // 自检诊断
     const de = $('diagEntry');
     if(de) de.addEventListener('click', function(){
-      showRoute('diag'); pushRoute('#/diag'); runDiag();
+      showRoute('diag'); pushRoute('#/diag');
     });
     const db = $('diagBack');
     if(db) db.addEventListener('click', function(){window.appBack();});
@@ -1567,32 +1623,18 @@
   }
   function loadElecCfg(){elecCfg=secureData.elec||null;}
   const pageRegistry={};
-  let savedDocumentScroll=0;
-  function setOverlayScroll(active){
-    if(active){
-      if(document.body.classList.contains('overlay-open'))return;
-      savedDocumentScroll=window.scrollY;
-      document.body.style.top=-savedDocumentScroll+'px';
-      document.body.classList.add('overlay-open');
-    }else if(document.body.classList.contains('overlay-open')){
-      document.body.classList.remove('overlay-open');document.body.style.top='';
-      window.scrollTo(0,savedDocumentScroll);
-    }
-  }
   function registerPage(id,options){pageRegistry[id]=options||{};}
   function showRoute(id){
     if(document.body.dataset.page==='cxWork'&&id!=='cxWork'&&window.JxauHomework&&!window.JxauHomework.leave())return;
     window.dispatchEvent(new CustomEvent('jxau:before-route',{detail:{from:document.body.dataset.page,to:id}}));
     closeMorningRoom();
     const current=document.body.dataset.page;if(current==='login'&&id!=='login')hideLoginPassword();
-    if(id==='diag')setOverlayScroll(true);
     if(pageRegistry[current]&&pageRegistry[current].onHide)pageRegistry[current].onHide();
     Object.keys(pageRegistry).forEach(name=>{if($(name))$(name).classList.add('hidden');});
     $('bookDetail').classList.add('hidden');closeDetail(true);closeModal(true);
     if($(id))$(id).classList.remove('hidden');
-    if(id!=='diag')setOverlayScroll(false);
     const main=MAIN_PAGES.indexOf(id)>=0;setTabbarVisible(main);
-    if(main){activeTab=id;document.querySelectorAll('.main-tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));}
+    if(main){activeTab=id;document.querySelectorAll('#mainTabbar .main-tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));}
     document.body.dataset.page=id;window.dispatchEvent(new CustomEvent('jxau:route',{detail:id}));
     if(pageRegistry[id]&&pageRegistry[id].onShow)pageRegistry[id].onShow({from:current});
   }
@@ -1620,7 +1662,7 @@
   function openLib(){switchMainTab('library');}
   function openChaoxing(){showRoute('chaoxing');pushRoute('#/chaoxing');}
   function openWaterDevice(){switchMainTab('waterDevice');}
-  let cxRows=[],cxData=null,cxFilter='all',cxSort='urgent',cxCourseFilter='',cxBusy=false,cxEpoch=0;
+  let cxRows=[],cxData=null,cxFilter='all',cxSort='urgent',cxCourseFilter='',cxBusy=false,cxEpoch=0,cxRetryTimer;
   let cxCourses=[];
   const cxCourseDialog=$('cxCourseDialog');
 
@@ -1730,7 +1772,9 @@
     document.querySelectorAll('.cx-filter').forEach(b=>b.classList.toggle('active',b.dataset.filter===cxFilter));
     document.querySelectorAll('[data-sort]').forEach(b=>b.classList.toggle('active',b.dataset.sort===cxSort));
     const todo=cxRows.filter(r=>r.state==='todo').length,unknown=cxRows.filter(r=>r.state!=='todo'&&r.state!=='done').length;
-    $('cxSummary').textContent=cxData?todo+' 条待完成'+(unknown?' · '+unknown+' 条状态待确认':'')+' · 共 '+cxRows.length+' 条作业':'';
+    const partial=cxData&&(cxData.scanning||cxData.manualResume||cxData.failed?.length);
+    $('cxSummary').textContent=cxData?todo+' 条待完成'+(unknown?' · '+unknown+' 条状态待确认':'')+
+      (partial?' · 已显示 ':' · 共 ')+cxRows.length+' 条作业':'';
     cxCourses=[...new Set(cxRows.map(r=>String(r.course||'未命名课程')).concat((cxData?.courseCatalog||[]).map(c=>c.title).filter(Boolean)))];
     if(cxCourseFilter&&!cxCourses.includes(cxCourseFilter))cxCourseFilter='';
     renderCxCourses();
@@ -1745,27 +1789,74 @@
       const content='<div class="cx-title"><b>'+esc(r.title)+'</b><span class="cx-state '+stateClass+'">'+esc(r.status||'状态待确认')+'</span>'+(r.url?'<span class="cx-task-chevron" aria-hidden="true">›</span>':'')+'</div><div class="cx-task-meta"><span class="cx-course-label"><span class="cx-course-symbol" aria-hidden="true">●</span><span>'+esc(r.course)+'</span></span>'+(when?'<span class="cx-deadline'+(urgent?' urgent':'')+'">'+esc(when)+'</span>':'')+(!r.url?'<span class="cx-no-entry">暂无入口</span>':'')+'</div>';
       html+=r.url?'<button type="button" class="cx-task cx-task-compact '+stateClass+'" style="'+theme+'" data-work-index="'+r.index+'">'+content+'</button>':'<article class="cx-task cx-task-compact '+stateClass+'" style="'+theme+'">'+content+'</article>';
     });
-    $('chaoxingList').innerHTML=html||'<div class="card feature-empty">'+(cxData?(cxData.scanning?'正在逐门读取课程作业，已读取的结果会立即显示':cxRows.length?'此分类暂无作业':cxData.failed&&cxData.failed.length?'暂未读取到作业，请查看下方失败课程。':'本次检查未发现作业记录。'):'连接后查看课程作业')+'</div>';
+    $('chaoxingList').innerHTML=html||'<div class="card feature-empty">'+(cxData?(cxData.scanning?'正在读取课程作业，结果会逐步显示':cxRows.length?'此分类暂无作业':cxData.manualResume||cxData.retryAt?'暂未读到作业，继续检查后可补齐剩余课程。':cxData.failed&&cxData.failed.length?'暂未读取到作业，请查看下方失败课程。':'本次检查未发现作业记录。'):'连接后查看课程作业')+'</div>';
     $('chaoxingList').querySelectorAll('[data-work-index]').forEach(b=>b.onclick=()=>window.dispatchEvent(new CustomEvent('jxau:homework',{detail:{...cxRows[Number(b.dataset.workIndex)],index:Number(b.dataset.workIndex)}})));
     if(cxData&&Array.isArray(cxData.failed)&&cxData.failed.length)$('chaoxingList').insertAdjacentHTML('beforeend','<details class="card cx-failures"><summary>'+cxData.failed.length+' 门课程未完整读取</summary>'+cxData.failed.map(x=>'<p><b>'+esc(x.course)+'</b><br>'+esc(x.message)+'</p>').join('')+'</details>');
   }
+  function updateCxControls(){
+    clearTimeout(cxRetryTimer);
+    const btn=$('chaoxingRefresh'),status=$('chaoxingStatus');
+    const retryAt=Number(cxData?.retryAt)||0;
+    const waiting=retryAt>Date.now();
+    btn.disabled=cxBusy||waiting;
+    btn.textContent=cxBusy?'检查中…':waiting?'等待恢复':cxData?.manualResume?'继续检查':'检查一次';
+    if(retryAt&&waiting){
+      status.textContent='学习通暂时限制访问。已读取 '+(cxData.completed||0)+' / '+(cxData.courses||'—')+
+        ' 门课，'+new Date(retryAt).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',second:'2-digit'})+' 后可继续。';
+      status.dataset.state='paused';
+      cxRetryTimer=setTimeout(updateCxControls,Math.min(2147483647,Math.max(1,retryAt-Date.now())));
+    }else if(retryAt&&!cxBusy){
+      status.textContent='现在可以继续检查，已读取的作业仍然保留。';
+      status.dataset.state='paused';
+    }
+  }
+
   async function loadChaoxing(force=false){
-    if(cxBusy)return;cxBusy=true;const epoch=++cxEpoch,btn=$('chaoxingRefresh');btn.disabled=true;btn.textContent='检查中…';
+    if(cxBusy)return;
+    cxBusy=true;
+    const epoch=++cxEpoch,status=$('chaoxingStatus');
+    updateCxControls();
     try{
-      const st=await featureApi('/api/chaoxing/status');if(epoch!==cxEpoch)return;
-      $('chaoxingLogin').textContent=st.bound?'重新绑定':'连接学习通';$('chaoxingDisconnect').classList.toggle('hidden',!st.bound);
-      if(!st.bound){cxRows=[];cxData=null;$('chaoxingStatus').textContent='尚未连接学习通账号';renderCx();return;}
-      let d=force?await featureApi('/api/chaoxing/scan',{}):await featureApi('/api/chaoxing/todo');
-      if(Array.isArray(d.items)){cxData=d;cxRows=d.items;renderCx();}
-      if(!d.scanning&&(!d.checkedAt||Date.now()-d.checkedAt>300000))d=await featureApi('/api/chaoxing/scan',{});
-      while(d.scanning){
-        if(epoch!==cxEpoch)return;if(Array.isArray(d.items)){cxData=d;cxRows=d.items;renderCx();}$('chaoxingStatus').textContent='正在检查 '+(d.completed||0)+' / '+(d.courses||'—')+' 门课'+(d.course?' · '+d.course:'');
-        await new Promise(r=>setTimeout(r,900));if(epoch!==cxEpoch)return;d=await featureApi('/api/chaoxing/todo');
+      const st=await featureApi('/api/chaoxing/status');
+      if(epoch!==cxEpoch)return;
+      $('chaoxingLogin').textContent=st.bound?'重新绑定':'连接学习通';
+      $('chaoxingDisconnect').classList.toggle('hidden',!st.bound);
+      if(!st.bound){
+        cxRows=[];cxData=null;
+        status.textContent='尚未连接学习通账号';delete status.dataset.state;
+        renderCx();return;
       }
-      if(epoch!==cxEpoch)return;cxData=d;cxRows=Array.isArray(d.items)?d.items:[];
-      $('chaoxingStatus').textContent='最近检查 '+new Date(d.checkedAt||Date.now()).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})+' · 共 '+(d.courses||0)+' 门课'+(d.warning?' · '+d.warning:'');renderCx();
-    }catch(e){if(epoch===cxEpoch){$('chaoxingStatus').textContent=e.message+(cxData?' · 保留上次检查结果':'');if(!cxData){$('chaoxingList').innerHTML='<div class="card err">'+esc(e.message)+'</div>';}}}
-    finally{if(epoch===cxEpoch){cxBusy=false;btn.disabled=false;btn.textContent='检查一次';}}
+      let d=await featureApi('/api/chaoxing/todo');
+      if(epoch!==cxEpoch)return;
+      if(Array.isArray(d.items)){cxData=d;cxRows=d.items;renderCx();}
+      if(!d.scanning&&!(d.retryAt>Date.now())&&(force||(!d.manualResume&&(!d.checkedAt||Date.now()-d.checkedAt>300000)))){
+        d=await featureApi('/api/chaoxing/scan',{});
+      }
+      while(d.scanning){
+        if(epoch!==cxEpoch)return;
+        if(Array.isArray(d.items)){cxData=d;cxRows=d.items;renderCx();}
+        status.textContent='正在检查 '+(d.completed||0)+' / '+(d.courses||'—')+' 门课'+(d.course?' · '+d.course:'');
+        status.dataset.state='running';
+        await new Promise(resolve=>setTimeout(resolve,900));
+        if(epoch!==cxEpoch)return;
+        d=await featureApi('/api/chaoxing/todo');
+      }
+      if(epoch!==cxEpoch)return;
+      cxData=d;cxRows=Array.isArray(d.items)?d.items:[];
+      const when=d.checkedAt?'最近检查 '+new Date(d.checkedAt).toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})+' · ':'';
+      status.textContent=d.manualResume?(d.warning||'可继续读取剩余课程')
+        :when+'共 '+(d.courses||0)+' 门课'+(d.warning?' · '+d.warning:'');
+      if(d.warning||d.manualResume)status.dataset.state='paused';
+      else delete status.dataset.state;
+      renderCx();
+    }catch(e){
+      if(epoch!==cxEpoch)return;
+      status.textContent=e.message+(cxData?' · 保留上次检查结果':'');
+      status.dataset.state='paused';
+      if(!cxData)$('chaoxingList').textContent='';
+    }finally{
+      if(epoch===cxEpoch){cxBusy=false;updateCxControls();}
+    }
   }
   function closeWaterEditor(){if(waterSaving)return false;window.HexuMotion.hide($('waterDeviceDialog'));return true;}
   function openWaterEditor(row,scannedId,origin){
@@ -1860,7 +1951,7 @@
   function closeLib(){window.appBack();}
   function openSettings(){switchMainTab('settings');}
   function closeSettings(){switchMainTab('today');}
-  window.Jxau={plan:{morning:date=>{const p=planPosition(date);return p.week>=1&&p.week<=state.total&&morningEnabled(p.day)?[{id:'morning',day:date,name:'早检',room:morningRoom||'',start:morningTime.start,end:morningTime.end,custom:true}]:[];},day:planDay,date:planDate,position:planPosition,raw:planRaw,meta:()=>({week:state.week||realWeek(),current:realWeek(),total:state.total||20,scope:planKey(),term:cacheTerm,owner:accountName,known:!!Object.keys(weekCache).length,cachedWeeks:Object.keys(weekCache).map(Number)}),changes:()=>{ensurePlan();return JSON.parse(JSON.stringify(planChanges));},commit:c=>planCommit(custom,c,'课程或调休修改'),history:planHistory,counts:()=>{ensurePlan();return {undo:planPast.length,redo:planFuture.length};},display:(day,week)=>planDay(planDate(week,day)),render:()=>{renderPages();renderToday();},color:colorFor,styleCourseBlock,detail:e=>openCourseDetail([e.name,e.room,e.group,e.teacher],document.querySelector('[data-occurrence-id="'+window.HexuSchedule.hash(e.occurrenceKey)+'"]'),e),closeDetail:()=>closeDetail(),viewWeek:week=>{state.week=week;renderPages();}},water:{openEditor:openWaterEditor,refresh:loadWaterDevices},calendar:{room:item=>item.room&&item.room!=='19:00-20:30'?item.room:item.name==='晚自习'?nightRoom||'':item.room||'',total:()=>state.total||20,applies:appliesToWeek,items:()=>custom,visible:visibleCustom,school:schoolCourses,week:()=>state.week,currentWeek:()=>Math.max(1,Math.min(state.total||20,realWeek())),save:calendarSave,display:(day,week)=>planDay(planDate(week,day)),times:SLOT_TIMES,hm:minuteText},courseStyle:cxCourseStyle,courseInitial:cxCourseInitial,registerPage:registerPage,showRoute:showRoute,pushRoute:pushRoute,toast:toast,refreshBindings:fillSettings};
+  window.Jxau={plan:{morning:date=>{const p=planPosition(date);return p.week>=1&&p.week<=state.total&&morningEnabled(p.day)?[{id:'morning',day:date,name:'早检',room:morningRoom||'',start:morningTime.start,end:morningTime.end,custom:true}]:[];},day:planDay,date:planDate,position:planPosition,raw:planRaw,meta:()=>({week:state.week||realWeek(),current:realWeek(),total:state.total||20,scope:planKey(),term:cacheTerm,owner:accountName,known:!!Object.keys(weekCache).length,cachedWeeks:Object.keys(weekCache).map(Number)}),changes:()=>{ensurePlan();return JSON.parse(JSON.stringify(planChanges));},commit:c=>planCommit(custom,c,'课程或调休修改'),history:planHistory,counts:()=>{ensurePlan();return {undo:planPast.length,redo:planFuture.length};},display:(day,week)=>planDay(planDate(week,day)),render:()=>{renderPages();renderToday();},color:colorFor,styleCourseBlock,detail:e=>openCourseDetail([e.name,e.room,e.group,e.teacher],document.querySelector('[data-occurrence-id="'+window.HexuSchedule.hash(e.occurrenceKey)+'"]'),e),closeDetail:()=>closeDetail(),viewWeek:week=>{state.week=week;renderPages();},gridHtml:scheduleGridHtml},water:{openEditor:openWaterEditor,refresh:loadWaterDevices},calendar:{room:item=>item.room&&item.room!=='19:00-20:30'?item.room:item.name==='晚自习'?nightRoom||'':item.room||'',total:()=>state.total||20,applies:appliesToWeek,items:()=>custom,visible:visibleCustom,school:schoolCourses,week:()=>state.week,currentWeek:()=>Math.max(1,Math.min(state.total||20,realWeek())),save:calendarSave,display:(day,week)=>planDay(planDate(week,day)),times:SLOT_TIMES,hm:minuteText},courseStyle:cxCourseStyle,courseInitial:cxCourseInitial,registerPage:registerPage,showRoute:showRoute,pushRoute:pushRoute,toast:toast,refreshBindings:fillSettings};
   window.appBack=function(){
     if(window.HexuConfirm&&window.HexuConfirm.close())return true;
     if(closeCxCourses())return true;
@@ -1888,12 +1979,20 @@
       else{showRoute(guideFrom);history.replaceState({},'','#/'+guideFrom);}
       return true;
     }
+    if(id==='scheduleBackground'){
+      if(history.state?.h==='#/scheduleBackground'&&location.hash==='#/scheduleBackground')history.back();
+      else{showRoute('schedule');history.replaceState({},'','#/schedule');}
+      return true;
+    }
     if(id==='classAliases'||id==='classAliasEditor'){
       if(history.state?.h==='#/'+id&&location.hash==='#/'+id)history.back();
       else{const parent=id==='classAliasEditor'?'classAliases':'schedulePreferences';showRoute(parent);history.replaceState({},'','#/'+parent);}
       return true;
     }
-    if(id==='notices'||id==='feedback'||id==='appearanceSettings'||id==='schedulePreferences'){showRoute('settings');history.replaceState({},'','#/settings');return true;}
+    if(id==='feedback'&&$('feedback').dataset.fromUpdate==='true'&&location.hash==='#/feedback'){
+      history.back();return true;
+    }
+    if(id==='notices'||id==='feedback'||id==='appUpdate'||id==='appearanceSettings'||id==='schedulePreferences'){showRoute('settings');history.replaceState({},'','#/settings');return true;}
     if(id==='waterSpendingDetail'){showRoute('waterDevice');history.replaceState({},'','#/waterDevice');return true;}
     if(id==='elec'&&history.state?.h==='#/elec'&&location.hash==='#/elec'){history.back();return true;}
     if(id==='elec'||id==='library'||id==='parcels'||id==='grades'||id==='integrations'||id==='chaoxing'||id==='waterDevice'){switchMainTab('today');return true;}
@@ -2242,10 +2341,10 @@
     $('libDisc').onchange=()=>doSearch(1);
     $('libMineView').insertAdjacentHTML('beforeend','<div class="card"><div class="lbl">借阅历史</div><button id="historyLoad" class="elec-btn">查看借阅历史</button><div id="libHistory"></div></div><div class="card"><div class="row2"><button id="rulesLoad" class="small-btn">借阅规则</button><button id="chartLoad" class="small-btn">借阅统计</button></div><div id="libExtra" class="reader-extra"></div></div>');
     $('historyLoad').onclick=loadHistory;$('rulesLoad').onclick=()=>readerExtra('rules');$('chartLoad').onclick=()=>readerExtra('chart');
-    $('setUser').closest('.account-card').insertAdjacentHTML('afterend','<details class="card settings-binding"><summary>账号与绑定<span>管理 ›</span></summary><div id="bindingState" class="reader-extra lbl"></div><div class="settings-binding-actions"><button id="rebindPortal" class="small-btn">重新登录门户</button><button id="rebindElec" class="small-btn">重新绑定电费</button><button id="unbindElec" class="small-btn">解绑电费</button></div></details>');
     $('rebindPortal').onclick=showLogin;$('rebindElec').onclick=()=>{showRoute('elec');pushRoute('#/elec');renderElecBind();};
     $('unbindElec').onclick=async()=>{if(!await window.HexuConfirm.ask('解绑电费账号？','将清除本机电费绑定信息，之后需要重新绑定才能查询。','确认解绑'))return;try{await saveVault('elec',null);elecCfg=null;fillSettings();toast('已解绑');}catch(e){toast(e.message);}};
     $('diagRun').addEventListener('click',()=>{todayElecAt=0;});
+    registerPage('diag',{onShow:runDiag,onHide:stopDiag});
   }
 
   (async function boot(){

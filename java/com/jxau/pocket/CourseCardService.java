@@ -49,13 +49,13 @@ public final class CourseCardService extends Service {
         if (deadline == activeUntil && start == activeStart && end == activeEnd
                 && title.equals(activeTitle) && text.equals(activeText)
                 && phase.equals(activePhase) && left.equals(activeLeft) && right.equals(activeRight)) return START_NOT_STICKY;
-        Notification card = CourseLiveCard.build(this, title, text, left, right,
-                start, end, deadline, now, phase, CourseLiveCard.SERVICE_ID);
-        if (card == null) {
-            stopSelf(id);
-            return START_NOT_STICKY;
-        }
         try {
+            Notification card = CourseLiveCard.build(this, title, text, left, right,
+                    start, end, deadline, now, phase, CourseLiveCard.SERVICE_ID);
+            if (card == null) {
+                stopSelf(id);
+                return START_NOT_STICKY;
+            }
             startForeground(CourseLiveCard.SERVICE_ID, card);
             activeUntil = deadline;
             activeStart = start;
@@ -67,8 +67,15 @@ public final class CourseCardService extends Service {
             activeRight = right;
             handler.removeCallbacks(expire);
             handler.postDelayed(expire, deadline - now);
+            CourseLiveCard.cancelUnhosted(this);
         } catch (RuntimeException unavailable) {
-            stopSelf(id);
+            try {
+                CourseLiveCard.postNotification(this, title, text, left, right, start, end, deadline, now, phase);
+            } catch (RuntimeException failed) {
+                android.util.Log.w("HexuClassMode", "Unable to post course notification", failed);
+            } finally {
+                stopSelf(id);
+            }
         }
         return START_NOT_STICKY;
     }

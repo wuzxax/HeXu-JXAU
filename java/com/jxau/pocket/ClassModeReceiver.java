@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
+import android.os.PowerManager;
 import android.service.notification.Condition;
 import org.json.JSONObject;
 
@@ -18,7 +19,8 @@ import org.json.JSONObject;
 public final class ClassModeReceiver extends BroadcastReceiver {
     private static final String LIVE = "live", QUIET = "quiet", RULE = "rule";
     private static final String QUIET_STUDY = "quietStudy", QUIET_CUSTOM = "quietCustom";
-    private static final String QUIET_END = "quietEnd", PREVIEW = "previewUntil";
+    private static final String QUIET_END = "quietEnd", QUIET_PENDING = "quietPending", PREVIEW = "previewUntil";
+    private static final String NEXT_BOUNDARY = "nextBoundary", LAST_BOUNDARY = "lastBoundary";
     private static final String TICK = "com.jxau.pocket.CLASS_BOUNDARY";
     private static final String BACKUP = "com.jxau.pocket.CLASS_QUIET_END";
     static final String STOP_LIVE = "com.jxau.pocket.STOP_COURSE_LIVE";
@@ -33,7 +35,13 @@ public final class ClassModeReceiver extends BroadcastReceiver {
                     change(context, new JSONObject().put("feature", LIVE).put("enabled", false));
                 } else if (intent != null && STOP_PREVIEW.equals(intent.getAction())) {
                     change(context, new JSONObject().put("feature", "preview").put("enabled", false));
-                } else sync(context);
+                } else {
+                    String action = intent == null ? null : intent.getAction();
+                    if (TICK.equals(action) || BACKUP.equals(action)) {
+                        prefs(context).edit().putLong(LAST_BOUNDARY, System.currentTimeMillis()).apply();
+                    }
+                    sync(context);
+                }
             } catch (Exception error) {
                 android.util.Log.w("HexuClassMode", "Unable to update class automation", error);
             } finally { result.finish(); }
@@ -87,7 +95,8 @@ public final class ClassModeReceiver extends BroadcastReceiver {
         int filter = manager.getCurrentInterruptionFilter();
         boolean filterActive = access && filter != NotificationManager.INTERRUPTION_FILTER_ALL
                 && filter != NotificationManager.INTERRUPTION_FILTER_UNKNOWN;
-        boolean quietActive = enabledRule && quietUntil > System.currentTimeMillis() && filterActive;
+        boolean quietActive = enabledRule && quietUntil > System.currentTimeMillis() && filterActive
+                && !p.getBoolean(QUIET_PENDING, false);
         if (quietActive && Build.VERSION.SDK_INT >= 36) {
             try { quietActive = manager.getAutomaticZenRuleState(id) == Condition.STATE_TRUE; }
             catch (RuntimeException unavailable) { quietActive = false; }
@@ -109,7 +118,11 @@ public final class ClassModeReceiver extends BroadcastReceiver {
                 .put("quietStudy", p.getBoolean(QUIET_STUDY, true))
                 .put("quietCustom", p.getBoolean(QUIET_CUSTOM, false))
                 .put("quietActive", quietActive).put("quietUntil", quietUntil)
-                .put("exact", exactAllowed(c));
+                .put("exact", exactAllowed(c))
+                .put("backgroundUnrestricted", c.getSystemService(PowerManager.class)
+                        .isIgnoringBatteryOptimizations(c.getPackageName()))
+                .put("nextBoundary", p.getLong(NEXT_BOUNDARY, 0))
+                .put("lastBoundary", p.getLong(LAST_BOUNDARY, 0));
     }
 
     static synchronized JSONObject change(Context c, JSONObject body) throws Exception {
@@ -190,9 +203,9 @@ public final class ClassModeReceiver extends BroadcastReceiver {
         if (!p.getBoolean(LIVE, false) && !p.getBoolean(QUIET, false)
                 && p.getLong(PREVIEW, 0) == 0 && p.getLong(QUIET_END, 0) == 0) {
             // This branch is also reached immediately after the last switch is turned off.
-            CourseLiveCard.finish(c);
-            schedule(c, TICK, 0, false);
+            scheduleBoundary(c, p, 0, false);
             schedule(c, BACKUP, 0, false);
+            CourseLiveCard.finish(c);
             return;
         }
         JSONObject data;
@@ -217,13 +230,29 @@ public final class ClassModeReceiver extends BroadcastReceiver {
         long end = quiet && exact ? window.quietUntil : 0;
         // Arrange both end alarms before entering DND, including a backup if exact access is revoked.
         if (end > now) schedule(c, BACKUP, end, false);
-        long tick = CourseLiveCard.sync(c, window, now, live, preview);
-        if (preview != 0 && preview <= now) p.edit().remove(PREVIEW).apply();
-        if (window.next > 0) tick = tick == 0 ? window.next : Math.min(tick, window.next);
-        boolean preciseTick = schedule(c, TICK, tick, exact);
+        long tick = window.next;
+        if (preview > now) tick = tick == 0 ? preview : Math.min(tick, preview);
+        boolean preciseTick = scheduleBoundary(c, p, tick, exact);
         boolean mayBeActive = syncQuiet(c, preciseTick ? end : 0);
         if (!mayBeActive) schedule(c, BACKUP, 0, false);
         else if (end == 0 || !preciseTick) schedule(c, BACKUP, now + 300_000L, false);
+
+        // A device's notification renderer must not block DND or rearming the next class.
+        if (preview != 0 && preview <= now) p.edit().remove(PREVIEW).apply();
+        try {
+            long cardTick = CourseLiveCard.sync(c, window, now, live, preview);
+            if (cardTick > now && (tick == 0 || cardTick < tick)) {
+                scheduleBoundary(c, p, cardTick, exact);
+            }
+        } catch (RuntimeException e) {
+            android.util.Log.w("HexuClassMode", "Unable to update course live card", e);
+        }
+    }
+
+    private static boolean scheduleBoundary(Context c, SharedPreferences p, long when, boolean exact) {
+        boolean precise = schedule(c, TICK, when, exact);
+        if (p.getLong(NEXT_BOUNDARY, 0) != when) p.edit().putLong(NEXT_BOUNDARY, when).apply();
+        return precise;
     }
 
     private static boolean schedule(Context c, String action, long when, boolean exact) {
@@ -247,7 +276,15 @@ public final class ClassModeReceiver extends BroadcastReceiver {
         String id = p.getString(RULE, "");
         AutomaticZenRule existing = id.isEmpty() ? null : manager.getAutomaticZenRule(id);
         if (existing != null) {
-            if (!existing.isEnabled()) throw new IllegalArgumentException("请在系统免打扰设置中启用「禾序 · 上课免打扰」");
+            if (!existing.isEnabled()) {
+                existing.setEnabled(true);
+                if (!manager.updateAutomaticZenRule(id, existing))
+                    throw new IllegalStateException("系统未能启用禾序的勿扰规则");
+                AutomaticZenRule restored = manager.getAutomaticZenRule(id);
+                if (restored == null || !restored.isEnabled())
+                    throw new IllegalStateException("系统仍停用了禾序的勿扰规则，请在系统中启用它");
+                p.edit().remove(QUIET_END).remove(QUIET_PENDING).commit();
+            }
             return;
         }
         Uri condition = Condition.newId(c).appendPath("in-class").build();
@@ -265,7 +302,7 @@ public final class ClassModeReceiver extends BroadcastReceiver {
         }
         String newId = manager.addAutomaticZenRule(rule);
         if (newId == null) throw new IllegalStateException("系统未能创建免打扰规则");
-        p.edit().putString(RULE, newId).remove(QUIET_END).commit();
+        p.edit().putString(RULE, newId).remove(QUIET_END).remove(QUIET_PENDING).commit();
     }
 
     private static boolean syncQuiet(Context c, long until) {
@@ -278,18 +315,27 @@ public final class ClassModeReceiver extends BroadcastReceiver {
         try {
             AutomaticZenRule rule = id.isEmpty() ? null : manager.getAutomaticZenRule(id);
             if (rule == null || !rule.isEnabled()) {
-                p.edit().remove(QUIET_END).commit();
+                p.edit().remove(QUIET_END).remove(QUIET_PENDING).commit();
                 return false;
             }
-            if ((previous != 0) != (until != 0) || (until > 0 && System.currentTimeMillis() >= previous)) {
-                // Persist the end before activation so recovery can clear an interrupted write.
-                if (until > 0 && !p.edit().putLong(QUIET_END, until).commit()) return false;
-                manager.setAutomaticZenRuleState(id, new Condition(rule.getConditionId(), "禾序课程",
-                        until > 0 ? Condition.STATE_TRUE : Condition.STATE_FALSE));
+            if (p.getBoolean(QUIET_PENDING, false) || (previous != 0) != (until != 0)
+                    || (until > 0 && System.currentTimeMillis() >= previous)) {
+                // Keep the end and a retry marker until the request returns successfully.
+                SharedPreferences.Editor request = p.edit().putBoolean(QUIET_PENDING, true);
+                if (until > 0) request.putLong(QUIET_END, until);
+                if (!request.commit()) return previous != 0;
+                int state = until > 0 ? Condition.STATE_TRUE : Condition.STATE_FALSE;
+                Condition condition = Build.VERSION.SDK_INT >= 35
+                        ? new Condition(rule.getConditionId(), "禾序课程", state, Condition.SOURCE_SCHEDULE)
+                        : new Condition(rule.getConditionId(), "禾序课程", state);
+                manager.setAutomaticZenRuleState(id, condition);
+                p.edit().putLong(QUIET_END, until).remove(QUIET_PENDING).commit();
+            } else if (previous != until) {
+                p.edit().putLong(QUIET_END, until).commit();
             }
-            if (previous != until) p.edit().putLong(QUIET_END, until).commit();
             return until > 0;
         } catch (RuntimeException e) {
+            android.util.Log.w("HexuClassMode", "Unable to change course DND rule", e);
             return p.getLong(QUIET_END, 0) != 0;
         }
     }

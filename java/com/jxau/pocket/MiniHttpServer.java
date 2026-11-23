@@ -62,6 +62,13 @@ public class MiniHttpServer {
 
     MiniHttpServer(Context ctx, CasClient client, java.util.function.Consumer<String> colorMode) {
         this.context=ctx.getApplicationContext();this.client = client; assets = ctx.getAssets(); assetVersion=readAssetVersion(); vault = new SecureStore(ctx); wanxiao=new WanxiaoClient(vault); lighting=new CloudLightingClient(vault);life798=new Life798Client(vault);chaoxing=new ChaoxingClient(vault);waterDevice=new WaterDeviceClient(vault);
+        add("GET", "/api/app/update", r -> {
+            try {
+                return Response.json(AppUpdate.fetch().toString());
+            } catch (Exception e) {
+                return Response.error(503, "暂时无法连接 GitHub 检查更新，请稍后重试，也可加群获取最新版本。");
+            }
+        });
         ScheduleExport exporter=new ScheduleExport(ctx);
         add("POST","/api/schedule/export",r->Response.json(exporter.stage(r.json()).toString()));
         add("POST","/api/schedule/snapshot",r->{JSONObject b=r.json();if(!client.user.equals(b.optString("owner")))return Response.error(409,"校园账号已变化，请重新打开课表");return Response.json(AgendaWidgetProvider.save(ctx,b).toString());});

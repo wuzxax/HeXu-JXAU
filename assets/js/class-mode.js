@@ -3,37 +3,13 @@
   const $ = id => document.getElementById(id);
   const live = $('classLive'), quiet = $('classQuiet'), preview = $('classPreview');
   const quietStudy = $('classQuietStudy'), quietCustom = $('classQuietCustom');
+  const quietEnableAccess = $('classQuietEnableAccess');
   const lead = $('classLead'), duration = $('classDuration');
-  let state, generation = 0, busy = false, timer;
+  let state, generation = 0, busy = false, timer, finishingPermission = false;
 
-  for (const details of document.querySelectorAll('.class-disclosure')) {
-    const summary = details.querySelector('summary'), content = details.querySelector('.class-disclosure-body');
-    let animation, open = details.open;
-    summary.addEventListener('click', event => {
-      if (!animation && (!content.animate || matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
-      event.preventDefault();
-      if (!animation) open = details.open;
-      const from = details.open ? content.getBoundingClientRect().height : 0;
-      const opacity = details.open ? getComputedStyle(content).opacity : 0;
-      animation?.cancel();
-      open = !open;
-      details.open = true;
-      content.inert = !open;
-      details.classList.toggle('is-collapsing', !open);
-      content.classList.add('is-expanding');
-      const motion = animation = content.animate(
-        [{height:from+'px',opacity},{height:(open ? content.scrollHeight : 0)+'px',opacity:open ? 1 : 0}],
-        {duration:300,easing:'cubic-bezier(.24,.72,.28,1)',fill:'both'}
-      );
-      motion.finished.then(() => {
-        if (animation !== motion) return;
-        details.open = open;
-        content.inert = false;
-        content.classList.remove('is-expanding');
-        details.classList.remove('is-collapsing');
-        motion.cancel();
-        animation = null;
-      }, () => {});
+  function boundaryTime(at) {
+    return new Date(at).toLocaleString('zh-CN', {
+      month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'Asia/Shanghai'
     });
   }
 
@@ -50,15 +26,31 @@
     $('classQuietCustomRow').classList.toggle('hidden', !state.quiet || !state.quietSupported);
     $('classQuietStudyRow').classList.toggle('hidden', !state.quiet || !state.quietSupported);
     live.disabled = busy || !state.liveSupported || (!state.live && (!state.notifications || needsColorOsPromotion));
-    quiet.disabled = busy || !state.quietSupported || (!state.quiet && (!state.quietAccess || !state.exact));
+    const permission = !state.quietAccess ? 'quiet' : !state.exact ? 'alarms' : '';
+    const needsPermission = state.quietSupported && !state.quiet && !!permission;
+    quiet.disabled = busy || !state.quietSupported || needsPermission;
+    quietEnableAccess.hidden = busy || !needsPermission;
+    if (needsPermission) quietEnableAccess.href = 'jxau-pocket://schedule/class-permission/' + permission + '-enable';
     $('classNotifications').hidden = !state.liveSupported || state.notifications;
     $('classPromotion').hidden = !state.liveSupported || !state.notifications || state.vivoCard
       || state.promotionSupported === false || (state.promoted && !state.xiaomiCard && !state.colorOsCard);
     $('classPromotion').textContent = state.colorOsCard ? '流体云设置' : '实时更新设置';
     $('classXiaomiNotifications').hidden = !state.xiaomiCard;
     $('classQuietAccess').hidden = !state.quietSupported || state.quietAccess;
-    $('classAlarmAccess').hidden = !state.quietSupported || !state.quietAccess || state.exact;
-    $('classRule').hidden = !state.quietAccess;
+    const showBackground = state.liveSupported || state.quietSupported;
+    $('classBackground').hidden = !showBackground;
+    $('classAlarmAccess').hidden = !showBackground || state.exact !== false;
+    $('classBatteryAccess').hidden = !showBackground || state.backgroundUnrestricted !== false;
+    $('classBackgroundStatus').textContent = state.backgroundUnrestricted === false
+      ? '电池优化可能延迟触发。若手机还有「允许后台活动」或「自启动」设置，请在系统应用设置中允许禾序。'
+      : state.backgroundUnrestricted === true
+      ? '已允许电池优化豁免。若手机仍延迟触发，请检查系统的后台活动和自启动设置。' : '';
+    const boundaries = [];
+    if (state.nextBoundary > 0) boundaries.push('下次后台检查 ' + boundaryTime(state.nextBoundary));
+    if (state.lastBoundary > 0) boundaries.push('上次收到系统唤醒 ' + boundaryTime(state.lastBoundary));
+    $('classBoundaryStatus').textContent = state.live || state.quiet || state.preview ? boundaries.join(' · ') : '';
+    $('classLiveBackgroundHint').hidden = !state.live || state.backgroundUnrestricted !== false;
+    $('classQuietBackgroundHint').hidden = !state.quiet || state.backgroundUnrestricted !== false;
     preview.hidden = !state.liveSupported || !state.notifications || (needsColorOsPromotion && !state.preview);
     preview.disabled = busy;
     preview.textContent = state.preview ? '结束演示' : '试发 2 分钟';
@@ -96,12 +88,12 @@
       : state.colorOsCard ? '可试发检查流体云。'
       : '支持 Android 实时更新的系统可显示胶囊，具体样式由系统决定。';
     $('classQuietStatus').textContent = !state.quietSupported ? '此功能需要 Android 10 或以上。'
-      : !state.quietAccess ? '请在系统设置中允许禾序访问免打扰。'
+      : !state.quietAccess ? '请在「勿扰访问权限」中选择禾序并允许访问。'
       : !state.exact ? '需要「闹钟与提醒」权限，才能按上下课时间切换。'
-      : state.quiet && !state.quietRuleReady ? '系统规则已停用或移除，请在系统中检查，或关闭后重新开启。'
+      : state.quiet && !state.quietRuleReady ? '禾序的勿扰规则已停用，请关闭后重新开启。'
       : state.quietActive ? '禾序免打扰已生效，预计 '+new Date(state.quietUntil).toLocaleTimeString('zh-CN',
         {hour:'2-digit',minute:'2-digit',timeZone:'Asia/Shanghai'})+' 结束。'
-      : state.quiet && state.quietUntil > Date.now() ? '已向系统提交规则，正在等待生效。可在「系统规则」查看。'
+      : state.quiet && state.quietUntil > Date.now() ? '已向系统提交禾序的勿扰规则，等待生效。'
       : state.quiet ? '等待下一项启用免打扰的安排。'
       : '';
     clearTimeout(timer);
@@ -117,16 +109,25 @@
     return result;
   }
 
-  async function refresh() {
-    if (!visible() || busy) return;
+  async function refresh(completeEnable = false) {
+    if (!visible() || busy || finishingPermission) return;
+    finishingPermission = completeEnable;
     const token = ++generation;
     try {
       const result = await request();
-      if (token !== generation) return;
+      if (!visible() || token !== generation) return;
       state = result;
-      render();
+      if (completeEnable && !state.quiet && state.quietSupported && state.quietAccess
+          && state.exact) {
+        finishingPermission = false;
+        await change('quiet', true);
+      } else {
+        render();
+      }
     } catch (error) {
       if (token === generation) $('classLiveStatus').textContent = error.message;
+    } finally {
+      if (completeEnable) finishingPermission = false;
     }
   }
 
@@ -144,6 +145,8 @@
       });
     } catch (error) {
       window.Jxau.toast(error.message);
+      busy = false;
+      await refresh();
     } finally {
       busy = false;
       render();
@@ -173,7 +176,8 @@
     await change('display', {mode:'custom', minutes:duration.valueAsNumber});
     duration.value = state.displayMinutes ?? 1;
   });
-  addEventListener('jxau:route', refresh);
-  addEventListener('jxau:foreground', refresh);
-  addEventListener('jxau:agenda-synced', refresh);
+  addEventListener('jxau:route', () => { void refresh(); });
+  addEventListener('jxau:foreground', () => { void refresh(); });
+  addEventListener('jxau:quiet-permission-return', () => { void refresh(true); });
+  addEventListener('jxau:agenda-synced', () => { void refresh(); });
 })();

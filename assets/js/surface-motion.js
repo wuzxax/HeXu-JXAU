@@ -42,6 +42,37 @@
   const promise=Promise.all([animation.finished,mask]).then(()=>{if(active.get(box)!==animation)return;el.classList.add('hidden');backdrops.get(el)?.cancel();backdrops.delete(el);el.classList.remove('surface-closing');stop(box);closing.delete(box);done?.();},()=>{});
   closing.set(box,promise);return promise;
  }
+ for (const details of document.querySelectorAll('[data-animated-disclosure]')) {
+  const summary = details.querySelector('summary'), content = details.querySelector('.disclosure-body');
+  let animation, open = details.open;
+  summary.addEventListener('click', event => {
+   if (!animation && (!content.animate || reduced())) return;
+   event.preventDefault();
+   if (!animation) open = details.open;
+   const from = details.open ? content.getBoundingClientRect().height : 0;
+   const opacity = details.open ? getComputedStyle(content).opacity : 0;
+   animation?.cancel();
+   open = !open;
+   details.open = true;
+   content.inert = !open;
+   details.classList.toggle('is-collapsing', !open);
+   content.classList.add('is-expanding');
+   const motion = animation = content.animate(
+    [{height:from+'px',opacity},{height:(open ? content.scrollHeight : 0)+'px',opacity:open ? 1 : 0}],
+    {duration:300,easing:'cubic-bezier(.24,.72,.28,1)',fill:'both'}
+   );
+   motion.finished.then(() => {
+    if (animation !== motion) return;
+    details.open = open;
+    content.inert = false;
+    content.classList.remove('is-expanding');
+    details.classList.remove('is-collapsing');
+    motion.cancel();
+    animation = null;
+   }, () => {});
+  });
+ }
+
  const observer=new MutationObserver(records=>{
   const candidates=new Set();
   for(const {target,attributeName,oldValue,addedNodes} of records){

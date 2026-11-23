@@ -32,7 +32,7 @@ public class MainActivity extends Activity {
     private MiniHttpServer server;
     private long lastBack;
     private String pendingScheduleExport;
-    private boolean savingScheduleImage;
+    private boolean savingScheduleImage, pendingQuietEnable;
     private long dockGestureAt, dockHapticAt;
     private android.webkit.ValueCallback<Uri[]> fileCallback;
     private android.webkit.PermissionRequest cameraRequest;
@@ -40,7 +40,10 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(savedInstanceState!=null)pendingScheduleExport=savedInstanceState.getString("schedule-export-id");
+        if (savedInstanceState != null) {
+            pendingScheduleExport = savedInstanceState.getString("schedule-export-id");
+            pendingQuietEnable = savedInstanceState.getBoolean("quiet-enable-pending");
+        }
         retireReminderExperiment();
         new SecureStore(this).removeRetiredWaterSettings();
         updateWindowColors();
@@ -208,6 +211,8 @@ public class MainActivity extends Activity {
         dispatchSystemColor();
     }
     private void openClassPermission(String type) {
+        boolean enableQuiet = "quiet-enable".equals(type) || "alarms-enable".equals(type);
+        if (enableQuiet) type = type.substring(0, type.indexOf('-'));
         Intent screen;
         Uri app = Uri.fromParts("package", getPackageName(), null);
         switch (type) {
@@ -235,27 +240,59 @@ public class MainActivity extends Activity {
                         .putExtra(Settings.EXTRA_CHANNEL_ID, CourseLiveCard.channelId());
                 break;
             case "quiet":
-                screen = new Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
-                break;
+                if (Build.VERSION.SDK_INT < 29) return;
+                pendingQuietEnable = enableQuiet;
+                if (getSystemService(android.app.NotificationManager.class).isNotificationPolicyAccessGranted()) {
+                    dispatchClassSettingsReturn();
+                    return;
+                }
+                Intent details = new Intent("android.settings.NOTIFICATION_POLICY_ACCESS_DETAIL_SETTINGS", app);
+                if (!startClassSettings(details)
+                        && !startClassSettings(new Intent(Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS))) {
+                    pendingQuietEnable = false;
+                    Toast.makeText(this, "请在系统设置搜索「勿扰访问权限」，选择禾序并授权", Toast.LENGTH_LONG).show();
+                }
+                return;
             case "alarms":
                 if (Build.VERSION.SDK_INT < 31) return;
                 screen = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, app);
                 break;
-            case "rules":
-                screen = new Intent("android.settings.ZEN_MODE_AUTOMATION_SETTINGS");
+            case "battery":
+                screen = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, app);
+                break;
+            case "app-info":
+                screen = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, app);
                 break;
             default: return;
         }
-        try { startActivity(screen); }
-        catch (RuntimeException e) {
-            Intent fallback = "xiaomi-notifications".equals(type) || "promotion".equals(type)
-                    ? new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName())
-                    : "rules".equals(type)
-                    ? new Intent("android.settings.ZEN_MODE_SETTINGS")
-                    : new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, app);
-            try { startActivity(fallback); }
-            catch (RuntimeException ignored) { }
+        pendingQuietEnable = enableQuiet;
+        if ("alarms".equals(type) && getSystemService(android.app.AlarmManager.class).canScheduleExactAlarms()) {
+            dispatchClassSettingsReturn();
+            return;
         }
+        if (startClassSettings(screen)) return;
+        Intent fallback = "xiaomi-notifications".equals(type) || "promotion".equals(type)
+                ? new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).putExtra(Settings.EXTRA_APP_PACKAGE, getPackageName())
+                : new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, app);
+        if (!startClassSettings(fallback)) pendingQuietEnable = false;
+    }
+
+    private boolean startClassSettings(Intent intent) {
+        try {
+            startActivity(intent);
+            return true;
+        } catch (RuntimeException unavailable) {
+            return false;
+        }
+    }
+
+    private void dispatchClassSettingsReturn() {
+        if (webView == null) return;
+        String permissionReturn = pendingQuietEnable
+                ? "dispatchEvent(new Event('jxau:quiet-permission-return'));" : "";
+        pendingQuietEnable = false;
+        webView.evaluateJavascript(permissionReturn + "dispatchEvent(new Event('jxau:foreground'));"
+                + "if(document.body.dataset.page==='waterDevice'&&window.Jxau)window.Jxau.water.refresh()", null);
     }
 
     private void saveScheduleImage(String id) {
@@ -310,7 +347,11 @@ public class MainActivity extends Activity {
     }
     @Override public void onRequestPermissionsResult(int code,String[] permissions,int[] grants){super.onRequestPermissionsResult(code,permissions,grants);if(code==705&&webView!=null)webView.evaluateJavascript("dispatchEvent(new Event('jxau:foreground'))",null);if(code==702&&cameraRequest!=null){if(grants.length>0&&grants[0]==android.content.pm.PackageManager.PERMISSION_GRANTED)cameraRequest.grant(new String[]{android.webkit.PermissionRequest.RESOURCE_VIDEO_CAPTURE});else cameraRequest.deny();cameraRequest=null;}}
     @Override protected void onNewIntent(Intent intent){super.onNewIntent(intent);setIntent(intent);if(webView!=null&&AgendaWidgetProvider.OPEN.equals(intent.getAction()))webView.evaluateJavascript("window.Jxau&&window.Jxau.showRoute(\'schedule\')",null);if(webView!=null&&"com.jxau.pocket.OPEN_WATER".equals(intent.getAction()))webView.evaluateJavascript("window.Jxau&&window.Jxau.showRoute('waterDevice')",null);}
-    @Override protected void onResume(){super.onResume();new Thread(()->ClassModeReceiver.sync(this),"class-resume").start();if(webView!=null)webView.evaluateJavascript("dispatchEvent(new Event('jxau:foreground'));if(document.body.dataset.page==='waterDevice'&&window.Jxau)window.Jxau.water.refresh()",null);}
+    @Override protected void onResume() {
+        super.onResume();
+        new Thread(() -> ClassModeReceiver.sync(this), "class-resume").start();
+        dispatchClassSettingsReturn();
+    }
 
     @Override
     protected void onActivityResult(int requestCode,int resultCode,Intent data){
@@ -330,7 +371,11 @@ public class MainActivity extends Activity {
         });
     }
 
-    @Override protected void onSaveInstanceState(Bundle out){super.onSaveInstanceState(out);if(pendingScheduleExport!=null)out.putString("schedule-export-id",pendingScheduleExport);}
+    @Override protected void onSaveInstanceState(Bundle out) {
+        super.onSaveInstanceState(out);
+        if (pendingScheduleExport != null) out.putString("schedule-export-id", pendingScheduleExport);
+        out.putBoolean("quiet-enable-pending", pendingQuietEnable);
+    }
 
     @Override
     protected void onDestroy() {

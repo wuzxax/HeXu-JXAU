@@ -14,6 +14,7 @@
     light:'<path d="M9 18v-2c-6-4-3-13 3-13s9 9 3 13v2Zm0 3h6M9 18h6"/>',
     lock:'<rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2"/>',
     search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>',
+    image:'<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8" cy="9" r="1.5"/><path d="m3 17 5-4 3 2 4-5 6 6"/>',
     trend:'<path d="m3 17 6-6 4 4 8-11m-6 0h6v6"/>'
   };
   function draw(element,name){

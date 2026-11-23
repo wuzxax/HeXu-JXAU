@@ -1,0 +1,174 @@
+:root{
+ --control-fill:#e8f0ea;--control-edge:#cfddd2;--control-ink:#254b3a;
+ --control-solid:#226349;--control-on:#fff;--control-radius:13px;
+ --control-quiet:#f8faf7;--control-error:#a84949;--control-hover:#dceadf
+}
+html[data-style=reading]{--control-radius:9px}
+html[data-style=soft]{--control-radius:16px}
+html[data-color-mode=dark]{
+ --control-fill:#253630;--control-edge:#3c554a;--control-ink:#bee5cd;
+ --control-solid:#abdfbd;--control-on:#14271d;--control-quiet:#202a26;
+ --control-error:#ffb5ae;--control-hover:#31473d
+}
+body :is(.small-btn,.fee-outline,.parcel-action,.topbar>button,.topbar .actions>button,.update-links button){
+ border:1px solid var(--control-edge);background:var(--control-fill);color:var(--control-ink);
+ min-height:40px;border-radius:var(--control-radius);font-size:12px;font-weight:650;letter-spacing:.02em
+}
+body :is(.elec-btn,.fee-action,.plan-primary,.update-download,#loginBtn){
+ border-radius:var(--control-radius);background:var(--control-solid);border-color:var(--control-solid);
+ color:var(--control-on);font-weight:650;letter-spacing:.025em
+}
+body :is(.small-btn,.fee-outline,.parcel-action,.elec-btn,.fee-action,.plan-primary,.update-download,.topbar button,.settings-link,.cx-filter){
+ transition:background-color .18s ease,border-color .18s ease,box-shadow .18s ease,filter .18s ease
+}
+body :is(.small-btn,.fee-outline,.parcel-action,.topbar>button,.topbar .actions>button):not(:disabled):active{
+ background:var(--control-hover);box-shadow:inset 0 1px 3px #183e2626
+}
+body :is(.elec-btn,.fee-action,.plan-primary,.update-download,#loginBtn):not(:disabled):active{filter:brightness(.9)}
+body :is(.small-btn,.fee-outline,.parcel-action,.elec-btn,.topbar button):disabled{
+ opacity:.54;cursor:default;box-shadow:none
+}
+body .settings-group .settings-link{border-radius:0}
+body .settings-group .settings-link:active{background:var(--control-quiet)}
+body .settings-link>span:last-child{color:var(--control-ink)}
+body .update-links button{padding:6px 10px}
+body #chaoxingDisconnect{color:var(--control-error);padding-inline:10px}
+#chaoxing .feature-heading{padding-block:4px 6px}
+#chaoxing .feature-heading h1{font-size:24px}
+#chaoxingStatus[data-state]{padding:9px 11px;border-inline-start:2px solid var(--control-edge);border-radius:5px 11px 11px 5px;background:var(--control-quiet);color:var(--ink)}
+#chaoxingStatus[data-state=paused]{border-inline-start-color:var(--control-error)}
+#chaoxing .feature-filters{gap:5px;margin-block:9px 12px}
+#chaoxing .feature-filters .cx-filter{min-height:36px;padding:6px 13px;border-radius:var(--control-radius);font-weight:600}
+#chaoxing .feature-filters .cx-filter.active{background:var(--control-fill);color:var(--control-ink);border-color:var(--control-edge)}
+#chaoxing :is(.feature-segment,.cx-course-trigger){border-radius:var(--control-radius);border-color:var(--control-edge)}
+#chaoxing .feature-segment button.active{color:var(--control-ink);background:var(--control-fill);box-shadow:none}
+#chaoxing .feature-empty{padding:16px 12px;text-align:center;line-height:1.65}
+#chaoxing .cx-failures{padding:13px 15px}
+@media(prefers-reduced-motion:reduce){
+ body :is(.small-btn,.fee-outline,.parcel-action,.elec-btn,.fee-action,.plan-primary,.update-download,.topbar button,.settings-link,.cx-filter){transition:none}
+}
+
+.schedule-wallpaper{
+ position:absolute;inset:0;width:100%;height:100%;pointer-events:none;
+ z-index:-1;opacity:var(--wallpaper-opacity,.26)
+}
+.schedule-wallpaper img{display:block;width:100%;height:100%;object-fit:cover}
+html[data-color-mode=dark] .schedule-wallpaper img{filter:brightness(.66)}
+.schedule-wallpaper[hidden]{display:none}
+.schedule-background-body{max-width:520px}
+.schedule-background-editor{display:grid;gap:13px}
+.bg-preview{
+ position:relative;width:min(100%,clamp(164px,29dvh,248px));margin-inline:auto;box-sizing:content-box;
+ isolation:isolate;border:1px solid var(--line);border-radius:16px;padding:0;overflow:hidden;background:var(--bg)
+}
+.bg-preview-viewport{position:relative;overflow:hidden;width:100%}
+.bg-preview-screen{
+ position:absolute;top:0;left:0;transform-origin:top left;pointer-events:none;padding-bottom:140px;
+ background:var(--bg);isolation:isolate
+}
+.bg-preview-screen .foot,.bg-preview-screen .bg-preview-navigation{
+ position:absolute;bottom:auto;margin-top:0
+}
+.bg-preview-screen .foot{top:calc(100dvh - 134px);height:46px}
+.bg-preview-screen .bg-preview-navigation{top:calc(100dvh - 79px)}
+.bg-preview-navigation .main-tab.active{background:var(--control-fill);color:var(--control-ink)}
+.bg-preview-glyph{display:flex;flex-direction:column;align-items:center;gap:2px}
+.bg-preview-confirm{
+ position:absolute;bottom:18%;left:50%;transform:translateX(-50%);
+ z-index:26;display:grid;place-items:center;opacity:0;width:40px;height:40px;
+ border-radius:50%;background:var(--control-solid);color:var(--control-on);box-shadow:0 4px 16px #0003
+}
+.bg-preview-confirm svg{width:21px;height:21px}
+.bg-strength{display:grid;grid-template-columns:auto minmax(0,1fr) 36px;gap:10px;align-items:center;font-size:12px}
+.bg-strength input{width:100%;height:34px;min-height:0;margin:0;padding:0;border:0;background:none;accent-color:var(--green)}
+.bg-strength output{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.bg-actions{display:flex;gap:8px;align-items:stretch}
+.bg-actions>*{flex:1;min-width:0;margin:0!important}
+#bgStatus{margin:0;min-height:20px}
+#bgRemove{justify-self:center;padding-inline:12px}
+#bgRemove:disabled{opacity:.55}
+
+:is(#schedule,.bg-preview-screen).has-wallpaper{
+ position:relative;isolation:isolate;min-height:100vh;min-height:100dvh;background:var(--bg);
+ --schedule-label:color-mix(in srgb,var(--ink) 74%,#061a12);
+ --schedule-rule:color-mix(in srgb,var(--ink) 15%,transparent)
+}
+html[data-color-mode=dark] :is(#schedule,.bg-preview-screen).has-wallpaper{--schedule-label:var(--ink)}
+:is(#schedule,.bg-preview-screen).has-wallpaper :is(.topbar,.weekbar,.table-wrap,.pages,.page,table,.schedule-head,thead th,td.slot,td.empty,tr.divider td),
+html[data-color-mode] :is(#schedule,.bg-preview-screen).has-wallpaper>.refresh-feedback{
+ background:transparent;box-shadow:none
+}
+html :is(#schedule,.bg-preview-screen).has-wallpaper :is(.topbar,.weekbar,.table-wrap){border-color:transparent;border-radius:0}
+:is(#schedule,.bg-preview-screen).has-wallpaper :is(.topbar .t,.schedule-week-label,.schedule-week-label small,.schedule-source,.semester-cache-status,thead th,thead th small,td.slot b,td.slot em,tr.divider span){
+ color:var(--schedule-label);text-shadow:0 0 3px var(--bg),0 1px 2px var(--bg)
+}
+:is(#schedule,.bg-preview-screen).has-wallpaper .schedule-source.is-warning,
+html[data-color-mode] :is(#schedule,.bg-preview-screen).has-wallpaper>.refresh-feedback{color:var(--schedule-label);font-weight:650}
+:is(#schedule,.bg-preview-screen).has-wallpaper :is(thead th,td.slot){border-color:var(--schedule-rule)}
+:is(#schedule,.bg-preview-screen).has-wallpaper tr.divider span::before,:is(#schedule,.bg-preview-screen).has-wallpaper tr.divider span::after{background:var(--schedule-rule)}
+:is(#schedule,.bg-preview-screen).has-wallpaper .morning-room-button{
+ background:transparent;border-color:transparent;color:var(--schedule-label);box-shadow:none
+}
+:is(#schedule,.bg-preview-screen).has-wallpaper :is(.morning-room-button small,.morning-day-mark){
+ color:var(--schedule-label);font-weight:650
+}
+:is(#schedule,.bg-preview-screen).has-wallpaper td.empty:active{background:color-mix(in srgb,var(--green) 15%,transparent)}
+:is(#schedule,.bg-preview-screen).has-wallpaper .calendar-event.school-occurrence{
+ background:color-mix(in srgb,var(--course-day,#e9f2ec) 88%,transparent)
+}
+html[data-color-mode=dark] :is(#schedule,.bg-preview-screen).has-wallpaper .calendar-event.school-occurrence{
+ background:color-mix(in srgb,var(--course-night,#2c4239) 94%,transparent)
+}
+
+#schedule .topbar .actions>#btnAdd2,.bg-preview-screen .topbar .actions>.bg-preview-add,#chaoxing #chaoxingRefresh{
+ background:var(--control-solid);color:var(--control-on);border-color:var(--control-solid)
+}
+#schedule .topbar .actions>#btnAdd2:active,#chaoxing #chaoxingRefresh:active{filter:brightness(.9)}
+
+:is(.login-guide,.guide-section) strong{color:var(--ink);font-weight:720}
+#classBackground .preference-note:last-child{margin-bottom:0}
+#classBackground .preference-note:empty{display:none}
+
+html #waterDevice{
+ --water-stop-bg:#faeae0;--water-stop-ink:#804421;--water-stop-edge:#eacbb8
+}
+html[data-color-mode=dark] #waterDevice{
+ --water-stop-bg:#473228;--water-stop-ink:#ffd5b5;--water-stop-edge:#74513c
+}
+html #waterDevice .water-device-toolbar :is(#waterScan,#waterDeviceAdd),
+html #waterDevice .water-device-row :is(.device-edit,[data-action]),
+html #waterDevice :is(#waterManage,#waterAccountFolded,#waterLoginAction,
+ #waterStatsRefresh,#waterHistoryLoad,#waterHistoryClose,#waterDeviceRefresh){
+ display:inline-flex;align-items:center;justify-content:center;gap:6px;
+ min-height:36px;margin:0;border:1px solid var(--control-edge);border-radius:11px;
+ padding:6px 10px;background:var(--control-fill);color:var(--control-ink);font-size:12px;
+ font-weight:650;line-height:1.2;white-space:nowrap;
+ transition:filter .18s ease,box-shadow .18s ease
+}
+html #waterDevice .water-device-toolbar #waterScan,
+html #waterDevice .water-device-row [data-action="start"],
+html #waterDevice #waterLoginAction{
+ background:var(--control-solid);border-color:var(--control-solid);color:var(--control-on)
+}
+html #waterDevice .water-device-toolbar :is(#waterScan,#waterDeviceAdd){min-height:41px;flex:1;min-width:0}
+html #waterDevice .water-device-toolbar #waterDeviceAdd{background:transparent}
+#waterDevice .water-device-toolbar svg{width:16px;height:16px;flex:none}
+html #waterDevice .water-device-row .device-edit{
+ width:36px;min-width:36px;height:36px;padding:0;background:transparent
+}
+html #waterDevice .water-device-row [data-action]{min-width:56px}
+html #waterDevice .water-device-row [data-action="end"]{
+ background:var(--water-stop-bg);color:var(--water-stop-ink);border-color:var(--water-stop-edge)
+}
+html #waterDevice :is(#waterManage,#waterAccountFolded,#waterStatsRefresh,#waterHistoryLoad,#waterHistoryClose,#waterDeviceRefresh){
+ background:transparent;font-size:11px
+}
+html #waterDevice #waterDeviceRefresh{min-height:38px;padding-inline:13px;background:var(--control-fill)}
+html #waterDevice .water-device-row .device-recover{color:var(--control-ink);font-size:10px;text-decoration:underline;text-underline-offset:2px}
+#waterDevice :is(.water-device-toolbar,.water-device-row,.section-heading,.water-balance-card,.water-login-note,.topbar) button:not(:disabled):active{
+ filter:brightness(.9);box-shadow:inset 0 1px 3px #0002
+}
+html #waterDevice button:disabled{opacity:.54;box-shadow:none}
+@media(prefers-reduced-motion:reduce){
+ html #waterDevice :is(.water-device-toolbar,.water-device-row,.section-heading,.water-balance-card,.water-login-note,.topbar) button{transition:none}
+}

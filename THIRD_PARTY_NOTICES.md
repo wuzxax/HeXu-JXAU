@@ -537,3 +537,5 @@ SOFTWARE.
 Sleepy (lingion/sleepy, GPL-3.0): feature and interaction reference for occurrence editing, transfers, history, export, agenda widgets, class automation, course aliases and glass appearance. This version independently implements these behaviors; no Sleepy source or assets are distributed. https://github.com/lingion/sleepy
 
 Vivo atomic-notification behavior is implemented from developer specification 896. Sleepy issue #164 was consulted for compatibility symptoms and the expected expansion behavior. https://dev.vivo.com.cn/documentCenter/doc/896 · https://github.com/lingion/sleepy/issues/164
+
+Classy（IMSX3D，GPL-3.0）：课表背景预览与内容分层的设计参考，禾序独立实现。 https://github.com/IMSX3D/Classy/blob/main/docs/design/CUSTOM_BACKGROUND.md

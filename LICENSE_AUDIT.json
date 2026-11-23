@@ -1,5 +1,11 @@
 [
   {
+    "repository": "IMSX3D/Classy",
+    "license": "GPL-3.0",
+    "licenseUrl": "https://github.com/IMSX3D/Classy/blob/main/LICENSE",
+    "usage": "schedule background design reference only"
+  },
+  {
     "repository": "feitangyuan/onetake",
     "license": "PolyForm Noncommercial 1.0.0",
     "licenseBlob": "51071c357084b2f8c5b427baffcc3ea0d2ad72ad",

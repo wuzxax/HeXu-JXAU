@@ -46,7 +46,7 @@ html[data-style=reading] .tday-row.next .bd,html[data-style=reading] .tday-row.c
 .calendar-fields .preference-note{font-size:10px;margin:10px 0 0}.calendar-fields .err{font-size:11px;min-height:18px;margin:5px 0}
 .calendar-actions button{font-size:12px;border-radius:10px}.calendar-actions #mDel{background:#f7ede8;padding-left:12px}.calendar-help{font-size:10px;margin-top:10px}
 .calendar-morph{background:#f8faf6;border-radius:8px;box-shadow:0 8px 16px #19372417}
-#schedule td.c{border-radius:7px;box-shadow:inset 2px 0 #99b29b}#schedule td.empty{border:0;border-top:1px solid #e7ece6;border-radius:0;background:transparent}#schedule td.empty:hover{background:#e1ecd9}
+:is(#schedule,.bg-preview-screen) td.c{border-radius:7px;box-shadow:inset 2px 0 #99b29b}:is(#schedule,.bg-preview-screen) td.empty{border:0;border-top:1px solid #e7ece6;border-radius:0;background:transparent}:is(#schedule,.bg-preview-screen) td.empty:hover{background:#e1ecd9}
 html #waterDevice .water-devices-card,html #waterDevice .water-stats-card{background:none;border:0;box-shadow:none;padding:0;margin:20px 0}
 #waterDevice .water-device-row,#waterDevice .water-device-row:last-child{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;margin:9px 0;min-height:66px}
 #waterDevice .water-spend-group{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
@@ -108,20 +108,20 @@ body.course-sheet-open{overflow:hidden}#detail.instant,#detailMask.instant{trans
 @media(prefers-reduced-motion:reduce){.main-tabbar .nav-carry{transition:none}}
 
 /* Quiet timetable: continuous, faint guides instead of seven broken cell borders. */
-#schedule table{--timetable-gap:2px;border-spacing:var(--timetable-gap)}
-#schedule tbody td.empty{border:0;background:transparent}
-#schedule tbody>tr:not(.divider){background:linear-gradient(to bottom,transparent calc(100% - 1px),#64856c12 0)}
-#schedule tr.divider{background:none}
-#schedule tr.divider td{border:0;height:18px;line-height:18px;letter-spacing:2px}
-#schedule tr.divider span{display:inline-flex;align-items:center;gap:9px;font-size:8px;color:#8e9d90}
-#schedule tr.divider span:before,#schedule tr.divider span:after{content:'';height:1px;width:24px;background:#7b997b29}
+:is(#schedule,.bg-preview-screen) table{--timetable-gap:2px;border-spacing:var(--timetable-gap)}
+:is(#schedule,.bg-preview-screen) tbody td.empty{border:0;background:transparent}
+:is(#schedule,.bg-preview-screen) tbody>tr:not(.divider){background:linear-gradient(to bottom,transparent calc(100% - 1px),#64856c12 0)}
+:is(#schedule,.bg-preview-screen) tr.divider{background:none}
+:is(#schedule,.bg-preview-screen) tr.divider td{border:0;height:18px;line-height:18px;letter-spacing:2px}
+:is(#schedule,.bg-preview-screen) tr.divider span{display:inline-flex;align-items:center;gap:9px;font-size:8px;color:#8e9d90}
+:is(#schedule,.bg-preview-screen) tr.divider span:before,:is(#schedule,.bg-preview-screen) tr.divider span:after{content:'';height:1px;width:24px;background:#7b997b29}
 /* The schedule actions share the same material preferences as the floating tabs. */
-#schedule .foot{background:rgba(249,255,245,var(--glass-alpha));border-radius:20px;padding:5px;gap:3px;bottom:calc(90px + env(safe-area-inset-bottom,0px))}
-html[data-glass=off] #schedule .foot{background:#f5f9f0}
-#schedule .foot button{position:relative;z-index:2;border-radius:14px;min-height:34px;background:transparent;color:var(--green);text-shadow:0 1px 3px #ffffffbf}
-#schedule .foot button:active{background:#43805413}
-#schedule .foot button:disabled{color:var(--muted)}
-#schedule .foot #btnReload:before{content:'';position:absolute;left:-2px;top:9px;bottom:9px;width:1px;background:#55775d24}
+:is(#schedule,.bg-preview-screen) .foot{background:rgba(249,255,245,var(--glass-alpha));border-radius:20px;padding:5px;gap:3px;bottom:calc(90px + env(safe-area-inset-bottom,0px))}
+html[data-glass=off] :is(#schedule,.bg-preview-screen) .foot{background:#f5f9f0}
+:is(#schedule,.bg-preview-screen) .foot button{position:relative;z-index:2;border-radius:14px;min-height:34px;background:transparent;color:var(--green);text-shadow:0 1px 3px #ffffffbf}
+:is(#schedule,.bg-preview-screen) .foot button:active{background:#43805413}
+:is(#schedule,.bg-preview-screen) .foot button:disabled{color:var(--muted)}
+:is(#schedule,.bg-preview-screen) .foot #btnReload:before{content:'';position:absolute;left:-2px;top:9px;bottom:9px;width:1px;background:#55775d24}
 .glass-optics{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-2;display:none}
 .glass-filter-defs{position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}
 /* The actual pages follow the navigation drag; lifecycle runs only after settling. */
@@ -134,24 +134,24 @@ html[data-glass=off] #schedule .foot{background:#f5f9f0}
 body.nav-page-dragging{overflow:hidden;overscroll-behavior:none}
 
 /* Custom schedules share course typography; time always follows the room. */
-#schedule .calendar-event{align-items:center;justify-content:center}
-#schedule .calendar-event .calendar-event-label{text-align:center;padding:4px 3px}
-#schedule .calendar-event .calendar-event-label strong{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:10px;font-weight:650;line-height:1.55;text-align:center;color:#344d43}
-#schedule .calendar-event .calendar-event-label .calendar-event-room{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;white-space:normal;overflow:hidden;font-size:9px;font-weight:400;line-height:1.4;text-align:center;color:#6b8176;margin-top:4px}
-#schedule .calendar-event .calendar-event-label .calendar-event-room:empty{display:none}
-#schedule .calendar-event .calendar-event-time{display:block;font-size:8px;font-weight:400;line-height:1.4;text-align:center;color:#6b8176;margin:4px 0 0;letter-spacing:-.3px}
-#schedule .calendar-event.is-short .calendar-event-time,#schedule .calendar-event.fixed-study .calendar-event-time{display:none!important}
-#schedule .calendar-event.is-short .calendar-event-label{padding:1px 3px}
-#schedule .calendar-event.is-short .calendar-event-label strong,#schedule .calendar-event.is-short .calendar-event-label .calendar-event-room{line-height:1.2}
-#schedule .calendar-event.is-short .calendar-event-label .calendar-event-room{margin-top:1px}
-#schedule .calendar-event.is-tiny .calendar-event-label{padding:1px 2px}
-#schedule .calendar-event.is-tiny .calendar-event-label strong,#schedule .calendar-event.is-tiny .calendar-event-label .calendar-event-room{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.1;margin-top:0}
-#schedule .calendar-event.fixed-study .calendar-event-label{padding:4px 3px}
-#schedule .calendar-event.fixed-study .calendar-event-label strong{line-height:1.55}
-#schedule .calendar-event.fixed-study .calendar-event-label .calendar-event-room{line-height:1.4;margin-top:4px}
-#schedule .calendar-event.fixed-study.is-tiny .calendar-event-label{padding:1px 2px}
-#schedule .calendar-event.fixed-study.is-tiny .calendar-event-label strong,#schedule .calendar-event.fixed-study.is-tiny .calendar-event-label .calendar-event-room{line-height:1.1;margin-top:0}
-@media(max-width:360px){#schedule .calendar-event .calendar-event-label strong{font-size:9px}}
+:is(#schedule,.bg-preview-screen) .calendar-event{align-items:center;justify-content:center}
+:is(#schedule,.bg-preview-screen) .calendar-event .calendar-event-label{text-align:center;padding:4px 3px}
+:is(#schedule,.bg-preview-screen) .calendar-event .calendar-event-label strong{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:10px;font-weight:650;line-height:1.55;text-align:center;color:#344d43}
+:is(#schedule,.bg-preview-screen) .calendar-event .calendar-event-label .calendar-event-room{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;white-space:normal;overflow:hidden;font-size:9px;font-weight:400;line-height:1.4;text-align:center;color:#6b8176;margin-top:4px}
+:is(#schedule,.bg-preview-screen) .calendar-event .calendar-event-label .calendar-event-room:empty{display:none}
+:is(#schedule,.bg-preview-screen) .calendar-event .calendar-event-time{display:block;font-size:8px;font-weight:400;line-height:1.4;text-align:center;color:#6b8176;margin:4px 0 0;letter-spacing:-.3px}
+:is(#schedule,.bg-preview-screen) .calendar-event.is-short .calendar-event-time,:is(#schedule,.bg-preview-screen) .calendar-event.fixed-study .calendar-event-time{display:none!important}
+:is(#schedule,.bg-preview-screen) .calendar-event.is-short .calendar-event-label{padding:1px 3px}
+:is(#schedule,.bg-preview-screen) .calendar-event.is-short .calendar-event-label strong,:is(#schedule,.bg-preview-screen) .calendar-event.is-short .calendar-event-label .calendar-event-room{line-height:1.2}
+:is(#schedule,.bg-preview-screen) .calendar-event.is-short .calendar-event-label .calendar-event-room{margin-top:1px}
+:is(#schedule,.bg-preview-screen) .calendar-event.is-tiny .calendar-event-label{padding:1px 2px}
+:is(#schedule,.bg-preview-screen) .calendar-event.is-tiny .calendar-event-label strong,:is(#schedule,.bg-preview-screen) .calendar-event.is-tiny .calendar-event-label .calendar-event-room{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.1;margin-top:0}
+:is(#schedule,.bg-preview-screen) .calendar-event.fixed-study .calendar-event-label{padding:4px 3px}
+:is(#schedule,.bg-preview-screen) .calendar-event.fixed-study .calendar-event-label strong{line-height:1.55}
+:is(#schedule,.bg-preview-screen) .calendar-event.fixed-study .calendar-event-label .calendar-event-room{line-height:1.4;margin-top:4px}
+:is(#schedule,.bg-preview-screen) .calendar-event.fixed-study.is-tiny .calendar-event-label{padding:1px 2px}
+:is(#schedule,.bg-preview-screen) .calendar-event.fixed-study.is-tiny .calendar-event-label strong,:is(#schedule,.bg-preview-screen) .calendar-event.fixed-study.is-tiny .calendar-event-label .calendar-event-room{line-height:1.1;margin-top:0}
+@media(max-width:360px){:is(#schedule,.bg-preview-screen) .calendar-event .calendar-event-label strong{font-size:9px}}
 .settings-subpage .settings-body{padding-top:16px;padding-bottom:28px}
 .settings-subpage .topbar{gap:8px}.settings-subpage .topbar>.t{font-size:18px;text-align:center}.settings-header-space{width:62px;flex:0 0 62px}
 
