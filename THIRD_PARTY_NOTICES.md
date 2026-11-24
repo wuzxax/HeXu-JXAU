@@ -539,3 +539,5 @@ Sleepy (lingion/sleepy, GPL-3.0): feature and interaction reference for occurren
 Vivo atomic-notification behavior is implemented from developer specification 896. Sleepy issue #164 was consulted for compatibility symptoms and the expected expansion behavior. https://dev.vivo.com.cn/documentCenter/doc/896 · https://github.com/lingion/sleepy/issues/164
 
 Classy（IMSX3D，GPL-3.0）：课表背景预览与内容分层的设计参考，禾序独立实现。 https://github.com/IMSX3D/Classy/blob/main/docs/design/CUSTOM_BACKGROUND.md
+
+学习通课程作业入口和列表兼容参考了两个项目的公开问题记录，禾序独立实现。 https://github.com/suiren0219/gdust-v2/issues/6 · https://github.com/07xh/dorm-os/pull/424

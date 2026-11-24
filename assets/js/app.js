@@ -1789,7 +1789,7 @@
       const content='<div class="cx-title"><b>'+esc(r.title)+'</b><span class="cx-state '+stateClass+'">'+esc(r.status||'状态待确认')+'</span>'+(r.url?'<span class="cx-task-chevron" aria-hidden="true">›</span>':'')+'</div><div class="cx-task-meta"><span class="cx-course-label"><span class="cx-course-symbol" aria-hidden="true">●</span><span>'+esc(r.course)+'</span></span>'+(when?'<span class="cx-deadline'+(urgent?' urgent':'')+'">'+esc(when)+'</span>':'')+(!r.url?'<span class="cx-no-entry">暂无入口</span>':'')+'</div>';
       html+=r.url?'<button type="button" class="cx-task cx-task-compact '+stateClass+'" style="'+theme+'" data-work-index="'+r.index+'">'+content+'</button>':'<article class="cx-task cx-task-compact '+stateClass+'" style="'+theme+'">'+content+'</article>';
     });
-    $('chaoxingList').innerHTML=html||'<div class="card feature-empty">'+(cxData?(cxData.scanning?'正在读取课程作业，结果会逐步显示':cxRows.length?'此分类暂无作业':cxData.manualResume||cxData.retryAt?'暂未读到作业，继续检查后可补齐剩余课程。':cxData.failed&&cxData.failed.length?'暂未读取到作业，请查看下方失败课程。':'本次检查未发现作业记录。'):'连接后查看课程作业')+'</div>';
+    $('chaoxingList').innerHTML=html||'<div class="card feature-empty">'+(cxData?(cxData.scanning?'正在读取课程作业，结果会逐步显示':cxRows.length?'此分类暂无作业':cxData.failed?.length?'暂未读取到作业，请查看下方未完整读取的课程。':cxData.manualResume||cxData.retryAt?'暂未读到作业，可继续检查剩余课程。':'本次检查未发现作业记录。'):'连接后查看课程作业')+'</div>';
     $('chaoxingList').querySelectorAll('[data-work-index]').forEach(b=>b.onclick=()=>window.dispatchEvent(new CustomEvent('jxau:homework',{detail:{...cxRows[Number(b.dataset.workIndex)],index:Number(b.dataset.workIndex)}})));
     if(cxData&&Array.isArray(cxData.failed)&&cxData.failed.length)$('chaoxingList').insertAdjacentHTML('beforeend','<details class="card cx-failures"><summary>'+cxData.failed.length+' 门课程未完整读取</summary>'+cxData.failed.map(x=>'<p><b>'+esc(x.course)+'</b><br>'+esc(x.message)+'</p>').join('')+'</details>');
   }
@@ -1837,7 +1837,7 @@
         if(Array.isArray(d.items)){cxData=d;cxRows=d.items;renderCx();}
         status.textContent='正在检查 '+(d.completed||0)+' / '+(d.courses||'—')+' 门课'+(d.course?' · '+d.course:'');
         status.dataset.state='running';
-        await new Promise(resolve=>setTimeout(resolve,900));
+        await new Promise(resolve=>setTimeout(resolve,d.courses>0&&d.courses<=6?400:900));
         if(epoch!==cxEpoch)return;
         d=await featureApi('/api/chaoxing/todo');
       }
